@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-export default function PublicProductsCatalog() {
+export default function ProductDetailPage() {
+  const params = useParams();
+  const sku = params.sku;
+
   // ENHANCED CATEGORY STRUCTURE WITH COMPREHENSIVE PRODUCT DETAILS
   const [categories] = useState([
     {
@@ -689,17 +693,9 @@ export default function PublicProductsCatalog() {
     }
   ]);
 
-  // STATE CONTROLS FOR THE B2B QUOTATION CART
   const [rfqCart, setRfqCart] = useState([]);
-  const [quantities, setQuantities] = useState({}); // Tracks quantity input per product id
+  const [quantities, setQuantities] = useState({});
   const [showFormModal, setShowFormModal] = useState(false);
-  
-  // SIDEBAR NAVIGATION STATE
-  const [expandedCategories, setExpandedCategories] = useState({}); // Track which categories are expanded
-  const [selectedItems, setSelectedItems] = useState({}); // Track selected categories/subcategories
-  const [filteredProducts, setFilteredProducts] = useState([]);
-
-  // USER DETAILS FORM STATES
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -708,90 +704,35 @@ export default function PublicProductsCatalog() {
     remarks: ""
   });
 
-  // Toggle category expansion in sidebar
-  const handleToggleCategory = (categoryId) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
-  };
+  // Find the product by SKU
+  let product = null;
+  let categoryName = "";
+  let subcategoryName = "";
 
-  // Toggle category selection
-  const handleSelectCategory = (categoryId) => {
-    setSelectedItems(prev => {
-      const updated = { ...prev };
-      if (updated[categoryId]) {
-        delete updated[categoryId];
-        // Remove all subcategories of this category
-        const category = categories.find(c => c.id === categoryId);
-        if (category) {
-          category.subcategories.forEach(sub => {
-            delete updated[sub.id];
-          });
-        }
-      } else {
-        // Select all subcategories when category is selected
-        const category = categories.find(c => c.id === categoryId);
-        if (category) {
-          updated[categoryId] = true;
-          category.subcategories.forEach(sub => {
-            updated[sub.id] = true;
-          });
-        }
+  for (const category of categories) {
+    for (const subcategory of category.subcategories) {
+      const foundProduct = subcategory.products.find(p => p.id === sku);
+      if (foundProduct) {
+        product = foundProduct;
+        categoryName = category.name;
+        subcategoryName = subcategory.name;
+        break;
       }
-      updateFilteredProducts(updated);
-      return updated;
-    });
-  };
+    }
+    if (product) break;
+  }
 
-  // Toggle subcategory selection
-  const handleSelectSubcategory = (categoryId, subcategoryId) => {
-    setSelectedItems(prev => {
-      const updated = { ...prev };
-      if (updated[subcategoryId]) {
-        delete updated[subcategoryId];
-      } else {
-        updated[subcategoryId] = true;
-      }
-      updateFilteredProducts(updated);
-      return updated;
-    });
-  };
-
-  // Update filtered products based on selected items
-  const updateFilteredProducts = (selected) => {
-    const products = [];
-    Object.keys(selected).forEach(itemId => {
-      categories.forEach(category => {
-        category.subcategories.forEach(subcategory => {
-          if (subcategory.id === itemId) {
-            products.push(...subcategory.products);
-          }
-        });
-      });
-    });
-    setFilteredProducts(products);
-  };
-
-  // Get the count of selected items
-  const getSelectedCount = () => {
-    return Object.keys(selectedItems).length;
-  };
-
-  // Handle local quantity field typing changes
   const handleQtyChange = (productId, value) => {
     const qty = parseInt(value) || 1;
     setQuantities(prev => ({ ...prev, [productId]: qty }));
   };
 
-  // Add Item with specified quantity directly to RFQ Bucket
   const addToRfqCart = (product) => {
     const selectedQty = quantities[product.id] || 1;
     
     setRfqCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
       if (existingItem) {
-        // If already added, update the requested units count
         return prevCart.map(item => 
           item.id === product.id ? { ...item, quantity: selectedQty } : item
         );
@@ -802,12 +743,10 @@ export default function PublicProductsCatalog() {
     alert(`Successfully appended ${selectedQty} units of ${product.id} to your Quote Bucket.`);
   };
 
-  // Remove Item from tracking cart array
   const removeFromCart = (id) => {
     setRfqCart(prev => prev.filter(item => item.id !== id));
   };
 
-  // Handle Submission Action for sending quotation logs via mail triggers
   const handleQuoteSubmission = (e) => {
     e.preventDefault();
     
@@ -820,25 +759,52 @@ export default function PublicProductsCatalog() {
     
     alert(`Thank you, ${formData.fullName}! Your quotation request for ${rfqCart.length} item lines has been compiled. A detailed digital quotation slip is being dispatched to ${formData.email}. Our Singrauli executive will connect on ${formData.mobile}.`);
     
-    // Clear state buckets post operational dispatch
     setRfqCart([]);
     setShowFormModal(false);
     setFormData({ fullName: "", email: "", mobile: "", companyName: "", remarks: "" });
   };
 
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800">
+        <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-6">
+            <Link href="/products" className="text-blue-600 hover:text-blue-900 font-semibold text-sm">
+              ← Back to Products
+            </Link>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-20 flex flex-col items-center justify-center h-96">
+          <div className="text-6xl mb-4 opacity-30">❌</div>
+          <h1 className="text-2xl font-black text-slate-900 mb-2">Product Not Found</h1>
+          <p className="text-slate-600 font-medium mb-6">SKU: {sku}</p>
+          <Link href="/products">
+            <button className="bg-blue-950 text-white font-black text-xs px-6 py-3 rounded-lg hover:bg-blue-900 transition-colors">
+              Return to Catalog
+            </button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const currentInputQty = quantities[product.id] || 1;
+  const isAlreadyInCart = rfqCart.some(item => item.id === product.id);
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800">
       
-      {/* HEADER - FULL WIDTH */}
+      {/* HEADER */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-black text-blue-900 uppercase tracking-widest">SBS GROUPS PARTNER CATALOG</span>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">B2B Product Sourcing Hub</h1>
-            <p className="text-xs text-slate-500 font-medium">Browse categories, select items, and request official dispatch quotes instantly.</p>
+            <Link href="/products" className="text-blue-600 hover:text-blue-900 font-semibold text-sm">
+              ← Back to Products
+            </Link>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-2">Product Details</h1>
           </div>
 
-          {/* FLOATING BANNER BUCKET STATUS CONTROLLER */}
+          {/* QUOTE BUCKET BUTTON */}
           <button 
             onClick={() => { if(rfqCart.length === 0) { alert("Your Quote bucket is currently empty. Please add items below."); return; } setShowFormModal(true); }}
             className="bg-blue-950 text-white font-bold text-xs px-5 py-3 rounded-xl uppercase tracking-wider shadow-lg flex items-center space-x-3 hover:bg-blue-900 transition-all transform active:scale-95 whitespace-nowrap"
@@ -852,221 +818,149 @@ export default function PublicProductsCatalog() {
         </div>
       </div>
 
-      {/* MAIN CONTAINER WITH SIDEBAR */}
-      <div className="flex gap-0">
-        
-        {/* ========== LEFT SIDEBAR ========== */}
-        <div className="w-full md:w-80 bg-white border-r border-slate-200 overflow-y-auto max-h-[calc(100vh-140px)] sticky top-24">
-          <div className="p-4">
-            <div className="mb-4 pb-4 border-b border-slate-200">
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">Categories</h2>
-              <p className="text-[10px] text-slate-500 font-medium">
-                Selected: <span className="font-black text-blue-900">{getSelectedCount()}</span>
-              </p>
-            </div>
-
-            {/* CATEGORY LIST */}
-            <div className="space-y-2">
-              {categories.map((category) => (
-                <div key={category.id} className="space-y-1">
-                  {/* CATEGORY HEADER */}
-                  <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors">
-                    <input
-                      type="checkbox"
-                      checked={!!selectedItems[category.id]}
-                      onChange={() => handleSelectCategory(category.id)}
-                      className="w-4 h-4 rounded border-slate-300 cursor-pointer accent-blue-900"
-                    />
-                    <button
-                      onClick={() => handleToggleCategory(category.id)}
-                      className="flex-1 text-left flex items-center justify-between hover:text-blue-900 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{category.icon}</span>
-                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">
-                          {category.name}
-                        </span>
-                      </div>
-                      <span className="text-xs text-slate-400">
-                        {expandedCategories[category.id] ? "▼" : "▶"}
-                      </span>
-                    </button>
-                  </div>
-
-                  {/* SUBCATEGORIES */}
-                  {expandedCategories[category.id] && (
-                    <div className="pl-8 space-y-1">
-                      {category.subcategories.map((subcategory) => (
-                        <div key={subcategory.id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 transition-colors bg-slate-50">
-                          <input
-                            type="checkbox"
-                            checked={!!selectedItems[subcategory.id]}
-                            onChange={() => handleSelectSubcategory(category.id, subcategory.id)}
-                            className="w-3 h-3 rounded border-slate-300 cursor-pointer accent-blue-900"
-                          />
-                          <label className="flex-1 text-left text-xs font-semibold text-slate-700 cursor-pointer hover:text-blue-900 transition-colors">
-                            {subcategory.name}
-                          </label>
-                          <span className="text-[9px] text-slate-500 font-medium">
-                            ({subcategory.productCount})
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* CLEAR SELECTION BUTTON */}
-            {getSelectedCount() > 0 && (
-              <button
-                onClick={() => {
-                  setSelectedItems({});
-                  setFilteredProducts([]);
-                }}
-                className="w-full mt-6 text-xs font-bold text-slate-600 hover:text-slate-900 py-2 px-3 rounded-lg border border-slate-300 hover:border-slate-400 transition-colors"
-              >
-                ✕ Clear Selection
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* ========== MAIN CONTENT AREA ========== */}
-        <div className="flex-1 p-4 md:p-8">
-          
-          {/* PRODUCTS HEADER */}
-          {getSelectedCount() > 0 && (
-            <div className="max-w-6xl mx-auto mb-8">
-              <h2 className="text-2xl font-black text-slate-900 mb-1">
-                {filteredProducts.length} Product{filteredProducts.length !== 1 ? "s" : ""} Available
-              </h2>
-              <p className="text-slate-600 font-medium text-sm">
-                Select items and request quotes instantly
-              </p>
-            </div>
-          )}
-
-          {/* CATEGORIES SHOWCASE (When nothing selected) */}
-          {getSelectedCount() === 0 && (
-            <div className="max-w-6xl mx-auto">
-              <div className="mb-8">
-                <h2 className="text-2xl font-black text-slate-900 mb-1">Browse All Categories</h2>
-                <p className="text-slate-600 font-medium text-sm">
-                  Select categories from the sidebar or click below to view products
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => (
-                  <div
-                    key={category.id}
-                    onClick={() => handleSelectCategory(category.id)}
-                    className="bg-white border border-slate-200/80 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer shadow-sm hover:shadow-lg hover:border-blue-400 transition-all transform hover:scale-105"
-                  >
-                    <div className="text-6xl mb-4">{category.icon}</div>
-                    <h3 className="text-lg font-black text-slate-900 mb-2">{category.name}</h3>
-                    <p className="text-sm text-slate-500 font-medium mb-4">
-                      {category.subcategories.reduce((sum, sub) => sum + sub.productCount, 0)} Products
-                    </p>
-                    <div className="flex flex-wrap gap-1 justify-center mb-3">
-                      {category.subcategories.map((sub) => (
-                        <span key={sub.id} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-semibold">
-                          {sub.name}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 text-xs text-blue-600 font-semibold">Select Category →</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* PRODUCTS GRID */}
-          {getSelectedCount() > 0 && filteredProducts.length > 0 && (
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => {
-                const currentInputQty = quantities[product.id] || 1;
-                const isAlreadyInCart = rfqCart.some(item => item.id === product.id);
-
-                return (
-                  <div key={product.id} className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-              
-                    {/* Product Info Labels */}
-                    <div>
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-[10px] font-mono font-bold text-slate-400">
-                          {product.id}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed font-medium">
-                        {product.specification}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-medium mt-1 flex items-center space-x-1">
-                        <span>📍 Warehouse Node:</span> <span className="font-semibold text-slate-600">{product.zone}</span>
-                      </p>
-                    </div>
-
-                    {/* Price Reveal Block Interception (Policy Compliant: Hidden B2B rates) */}
-                    <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unit Value:</span>
-                        <span className="text-xs font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                          Price On Request
-                        </span>
-                      </div>
-
-                      {/* Quantitative input field & basket injection layout controls */}
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 shrink-0">
-                          <input 
-                            type="number" 
-                            min="1"
-                            value={currentInputQty}
-                            onChange={(e) => handleQtyChange(product.id, e.target.value)}
-                            className="w-full text-center font-bold text-xs border border-slate-200 rounded-lg py-2 focus:outline-none focus:border-blue-950 bg-slate-50"
-                            title="Set Bulk Quantity Requirement"
-                          />
-                        </div>
-                        <button 
-                          onClick={() => addToRfqCart(product)}
-                          className={`flex-1 text-[10px] font-black uppercase tracking-wider py-2 rounded-lg transition-colors border ${
-                            isAlreadyInCart 
-                              ? "bg-lime-500 text-slate-900 border-lime-500" 
-                              : "bg-slate-900 text-white hover:bg-slate-800 border-slate-900"
-                          }`}
-                        >
-                          {isAlreadyInCart ? "🔄 Update Bulk Units" : "➕ Add to Quote"}
-                        </button>
-                      </div>
-
-                      {/* View Details Button */}
-                      <Link href={`/products/${product.id}`}>
-                        <button className="w-full text-[10px] font-black text-blue-600 uppercase tracking-wider py-2 rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors">
-                          👁️ View Details
-                        </button>
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      {/* BREADCRUMB */}
+      <div className="bg-white border-b border-slate-200 px-4 md:px-8 py-3">
+        <div className="max-w-7xl mx-auto text-xs font-medium text-slate-600">
+          <Link href="/products" className="text-blue-600 hover:text-blue-900">Products</Link>
+          <span className="mx-2 text-slate-400">/</span>
+          <span>{categoryName}</span>
+          <span className="mx-2 text-slate-400">/</span>
+          <span>{subcategoryName}</span>
+          <span className="mx-2 text-slate-400">/</span>
+          <span className="font-black text-slate-900">{product.id}</span>
         </div>
       </div>
 
-      {/* -------------------------------------------------------------------------- */}
-      {/* DYNAMIC BACKDROP MODAL: REQUEST FOR QUOTE USER REGISTRATION DATA INPUT FORM */}
-      {/* -------------------------------------------------------------------------- */}
+      {/* MAIN CONTENT */}
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* LEFT SECTION - PRODUCT INFO */}
+          <div className="md:col-span-2">
+            <div className="bg-white rounded-2xl p-8 border border-slate-200">
+              
+              {/* PRODUCT HEADER */}
+              <div className="mb-8">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Product SKU</p>
+                    <h1 className="text-3xl font-black text-slate-900 mb-4">{product.name}</h1>
+                    <p className="text-lg font-mono font-bold text-blue-600 bg-blue-50 px-3 py-2 rounded-lg w-fit">
+                      {product.id}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* CATEGORY & SUBCATEGORY */}
+              <div className="grid grid-cols-2 gap-4 mb-8 pb-8 border-b border-slate-200">
+                <div>
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Category</p>
+                  <p className="text-sm font-semibold text-slate-900">{categoryName}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Subcategory</p>
+                  <p className="text-sm font-semibold text-slate-900">{subcategoryName}</p>
+                </div>
+              </div>
+
+              {/* SPECIFICATION */}
+              <div className="mb-8">
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Technical Specifications</p>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                  <p className="text-sm text-slate-900 font-medium leading-relaxed">
+                    {product.specification}
+                  </p>
+                </div>
+              </div>
+
+              {/* WAREHOUSE ZONE */}
+              <div className="mb-8 pb-8 border-b border-slate-200">
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Available at</p>
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                  <span className="text-2xl">📍</span>
+                  <div>
+                    <p className="text-xs font-black text-emerald-900 uppercase">Warehouse Node</p>
+                    <p className="text-sm font-bold text-emerald-700">{product.zone}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* PRICING INFO */}
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-orange-200 rounded-lg p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-black text-orange-900 uppercase tracking-widest mb-1">Price Information</p>
+                    <p className="text-sm text-orange-800 font-medium">Contact us for competitive bulk pricing</p>
+                  </div>
+                  <span className="text-4xl">💰</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* RIGHT SECTION - ADD TO QUOTE */}
+          <div>
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 sticky top-32">
+              <h2 className="text-lg font-black text-slate-900 mb-6">Add to Quote</h2>
+
+              {/* QUANTITY SELECTOR */}
+              <div className="mb-6">
+                <label className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 block">
+                  Required Quantity (Units)
+                </label>
+                <input 
+                  type="number" 
+                  min="1"
+                  value={currentInputQty}
+                  onChange={(e) => handleQtyChange(product.id, e.target.value)}
+                  className="w-full text-center font-black text-xl border-2 border-slate-300 rounded-xl py-3 focus:outline-none focus:border-blue-950 bg-slate-50"
+                  title="Set Bulk Quantity Requirement"
+                />
+              </div>
+
+              {/* ADD TO CART BUTTON */}
+              <button 
+                onClick={() => addToRfqCart(product)}
+                className={`w-full text-sm font-black uppercase tracking-wider py-3 rounded-xl transition-colors border-2 mb-4 ${
+                  isAlreadyInCart 
+                    ? "bg-lime-500 text-slate-900 border-lime-500 hover:bg-lime-600" 
+                    : "bg-blue-950 text-white border-blue-950 hover:bg-blue-900"
+                }`}
+              >
+                {isAlreadyInCart ? "✓ Already Added - Update Quantity" : "➕ Add to Quote Bucket"}
+              </button>
+
+              {/* STATUS */}
+              {isAlreadyInCart && (
+                <div className="bg-lime-50 border border-lime-200 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-black text-lime-900 text-center">
+                    ✓ In Quote Bucket ({rfqCart.find(item => item.id === product.id)?.quantity} units)
+                  </p>
+                </div>
+              )}
+
+              {/* REQUEST QUOTE BUTTON */}
+              <button 
+                onClick={() => { if(rfqCart.length === 0) { alert("Please add items to your quote bucket first."); return; } setShowFormModal(true); }}
+                className="w-full text-sm font-black text-blue-950 uppercase tracking-wider py-3 rounded-xl border-2 border-blue-950 hover:bg-blue-50 transition-colors"
+                disabled={rfqCart.length === 0}
+              >
+                🚀 Request Quotation
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* QUOTE FORM MODAL */}
       {showFormModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 z-50 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
             
-            {/* Modal Heading Header */}
             <div className="bg-blue-950 text-white px-6 py-4 flex justify-between items-center shrink-0">
               <div>
                 <h2 className="text-sm font-black uppercase tracking-wider">Compile Procurement RFQ Slip</h2>
@@ -1075,10 +969,8 @@ export default function PublicProductsCatalog() {
               <button onClick={() => setShowFormModal(false)} className="text-white/60 hover:text-white font-bold text-sm">✕</button>
             </div>
 
-            {/* Split Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
               
-              {/* Selected items array visualization display block */}
               <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Items Bundled Inside Order Line ({rfqCart.length})</p>
                 <div className="divide-y divide-slate-200/60 max-h-36 overflow-y-auto pr-1">
@@ -1099,7 +991,6 @@ export default function PublicProductsCatalog() {
                 </div>
               </div>
 
-              {/* Secure Registration form input layers */}
               <form onSubmit={handleQuoteSubmission} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -1124,7 +1015,7 @@ export default function PublicProductsCatalog() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase">Official Email Address Address</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">Official Email Address</label>
                     <input 
                       type="email" required value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -1166,7 +1057,6 @@ export default function PublicProductsCatalog() {
         </div>
       )}
 
-      {/* Embedded Mini styling layout wrapper updates */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
