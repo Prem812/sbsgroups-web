@@ -12,8 +12,13 @@ export default function Header() {
     { name: "About Us", href: "/about" },
     { name: "Products", href: "/products" },
     { name: "Clients", href: "/clients" },
-    { name: "Certificates", href: "/certificates" },
+    { name: "Brands", href: "/brands" },
     { name: "Contact", href: "/contact" },
+    { name: "Testimonials", href: "/testimonials" },
+    { name: "News", href: "/news" },
+    { name: "Distributors", href: "/distributors" },
+    { name: "Employees", href: "/employees" },
+
   ];
 
   return (
