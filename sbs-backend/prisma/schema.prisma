@@ -1,0 +1,407 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+//--------------enums-------------------
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum LayoutType {
+  LEFT
+  CENTER
+  RIGHT
+}
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  EMAIL
+  NUMBER
+  SELECT
+}
+
+enum GridWidth {
+  HALF    // 1 row me 2 elements (sm:col-span-1)
+  FULL    // 1 row me 1 elements (sm:col-span-2)
+}
+//----------------------------
+
+// 1. MASTER USER TABLE (For Seeding Admin Login)
+model User {
+  id              String        @id @default(cuid())
+  name            String
+  email           String        @unique
+  password        String        // Will contain hashed "admin@1234" initially
+  image           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+// 2. DESIGNATION TABLE 
+model Designation {
+  id        String     @id @default(cuid())
+  title     String     @unique // e.g., "HR", "Salesman", "Data Entry Operator"
+  employees Employee[] 
+  createdAt DateTime   @default(now())
+}
+
+// 3. EMPLOYEE TABLE
+model Employee {
+  id             String           @id @default(cuid())
+  firstName      String
+  middleName     String?          
+  surname        String       
+  image          String?          
+  area           String?           // e.g., "Waidhan Area" or "In Office"
+  workingSince   DateTime?
+  description    String?          @db.LongText // Supports massive rich text layout data
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  designationId  String
+  designation    Designation      @relation(fields: [designationId], references: [id])
+  
+  emails         EmployeeEmail[]
+  phones         EmployeePhone[]
+  socialLinks    EmployeeSocial[]
+  brands         EmployeeBrand[]
+}
+
+// Sub-tables for Employee Multi-values
+model EmployeeEmail {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+model EmployeePhone {
+  id         String   @id @default(cuid())
+  number     String   @unique
+  isWhatsapp Boolean  @default(false)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+model EmployeeSocial {
+  id         String   @id @default(cuid())
+  platform   String   
+  url        String
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+}
+
+// 4. BRAND / AUTHORISED DISTRIBUTOR TABLE
+model Brand {
+  id           String        @id @default(cuid())
+  name         String
+  companyName  String
+  webUrl       String?
+  logo         String?
+  brochure     String?       
+  workingSince DateTime
+  createdAt    DateTime      @default(now())
+
+  socialLinks  BrandSocial[]
+  gallery      BrandGallery[]
+  products     Product[]
+  salesMen     EmployeeBrand[] 
+  testimonials Testimonial[]
+}
+
+model BrandSocial {
+  id      String @id @default(cuid())
+  platform String 
+  url     String
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model BrandGallery {
+  id          String @id @default(cuid())
+  imageUrl    String
+  description String @db.Text 
+  brandId     String
+  brand       Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+// 5. CATEGORY HIERARCHY
+model Category {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  parentId   String?
+  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  subFiles   Category[] @relation("CategoryHierarchy")
+  products   Product[]
+}
+
+// 6. PRODUCT TABLE
+model Product {
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  name           String
+  description    String?         @db.Text
+  createdAt      DateTime        @default(now())
+
+  brandId        String
+  brand          Brand           @relation(fields: [brandId], references: [id])
+  categoryId     String
+  category       Category        @relation(fields: [categoryId], references: [id])
+  
+  images         ProductImage[]
+  specifications ProductSpecification[] 
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductSpecification {
+  id        String  @id @default(cuid())
+  key       String  
+  value     String  
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// 7. TESTIMONIAL TABLE
+model Testimonial {
+  id        String   @id @default(cuid())
+  review    String   @db.Text
+  rating    Int      @default(5)
+  createdAt DateTime @default(now())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+// PIVOT TABLE: Employee <-> Brand
+model EmployeeBrand {
+  employeeId String
+  brandId    String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  brand      Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, brandId]) 
+}
+
+// 8. OUR OWN BRANDS TABLE
+model OurBrand {
+  id                 String                  @id @default(cuid())
+  name               String                  @unique
+  logo               String?                 // Path or URL to the brand logo
+  vision             String?                 @db.Text
+  mission            String?                 @db.Text
+  description        String?                 @db.LongText // Rich Text Editor for complete layout engine
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  // Dynamic Array Sub-tables
+  coreValues         OurBrandCoreValue[]
+  images             OurBrandImage[]
+  awards             OurBrandAward[]
+  projects           OurBrandProject[]
+}
+
+// Sub-table for Core Values
+model OurBrandCoreValue {
+  id          String   @id @default(cuid())
+  title       String   // e.g., "Integrity", "Innovation"
+  description String?  @db.Text
+  ourBrandId  String
+  ourBrand    OurBrand @relation(fields: [ourBrandId], references: [id], onDelete: Cascade)
+}
+
+// Sub-table for Multiple Gallery Images
+model OurBrandImage {
+  id          String   @id @default(cuid())
+  url         String
+  caption     String?  @db.Text
+  ourBrandId  String
+  ourBrand    OurBrand @relation(fields: [ourBrandId], references: [id], onDelete: Cascade)
+}
+
+// Sub-table for Awards & Achievements
+model OurBrandAward {
+  id          String   @id @default(cuid())
+  title       String   // Name of the achievement
+  year        String?  // e.g., "2025"
+  image       String?  // Optional certificate/award photo
+  description String?  @db.Text
+  ourBrandId  String
+  ourBrand    OurBrand @relation(fields: [ourBrandId], references: [id], onDelete: Cascade)
+}
+
+// Sub-table for Portfolio Projects done under this brand
+model OurBrandProject {
+  id          String   @id @default(cuid())
+  title       String   // Project Name
+  location    String?  // Where the project was deployed
+  year        String?  
+  image       String?  
+  description String?  @db.LongText // Supports full case studies via rich text editor
+  ourBrandId  String
+  ourBrand    OurBrand @relation(fields: [ourBrandId], references: [id], onDelete: Cascade)
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------------
+//hero carousel table do not change this 
+model HeroCarousel {
+  // CUID configuration for MySQL (VARCHAR(25) to VARCHAR(30) internally)
+  id               String        @id @default(cuid())
+  
+  // Media Type Configuration (Enum use kiya hai safe data ke liye)
+  mediaType        MediaType     @default(IMAGE)
+  mediaUrl         String        @db.VarChar(512)
+  
+  // Video Controls (Booleans)
+  videoLoop        Boolean       @default(false)
+  videoNextOnEnd   Boolean       @default(false)
+  
+  // Timing Control (Seconds me duration)
+  duration         Int           @default(5)
+  
+  // Layout Alignment Control
+  layoutType       LayoutType    @default(LEFT)
+  
+  // Content Fields
+  title            String        @db.VarChar(255)
+  subtitle         String?       @db.VarChar(255) // Optional field
+  description      String?       @db.Text         // Long text support
+  
+  // Call To Action (CTA) Button Configuration
+  ctaText          String        @default("Learn More") @db.VarChar(50)
+  ctaLink          String        @default("#") @db.VarChar(255)
+  
+  // Style Customization (Tailwind classes store karne ke liye)
+  badgeColor       String        @default("bg-red-600") @db.VarChar(50)
+  ctaColor         String        @default("bg-blue-900 hover:bg-blue-800") @db.VarChar(100)
+  
+  // Administrative fields
+  sortOrder        Int           @default(0)
+  isActive         Boolean       @default(true)
+  
+  // Timestamps
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("hero_carousels") // Database me table ka naam snake_case me rakhne ke liye
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
+// ==========================================
+//        DYNAMIC FAQ MATRIX ENGINE
+// ==========================================
+
+model Faq {
+  id          String   @id @default(uuid())
+  question    String   @db.Text
+  slug        String   @unique
+  answerJson  Json     // EditorJS pure JSON save karega clean format me block level pe
+  isPinned    Boolean  @default(false) // Pinned to Homepage/ContactUs page strip
+  isActive    Boolean  @default(true)
+  viewsCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserSubmittedQuestion {
+  id             String    @id @default(uuid())
+  email          String
+  question       String    @db.Text
+  isAnswered     Boolean   @default(false)
+  isPublishedFaq Boolean   @default(false) // Dynamic capability to display on live pools
+  adminAnswerJson Json?     // Managed via editorJS block inside admin node desk
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model FaqSystemSettings {
+  id                  Int      @id @default(1)
+  maxQuestionLength   Int      @default(500)
+  enforceEmailCheck   Boolean  @default(true)
+  notifyAdminOnNewQ   Boolean  @default(true)
+  autoResponseEmail   Boolean  @default(true)
+}
+
+model FaqItem {
+  id          String   @id @default(cuid())
+  question    String   @db.VarChar(512)
+  slug        String   @unique @db.VarChar(512)
+  
+  // EditorJS ka output hamesha ek nested JSON object hota hai, isliye ise MySQL me Json type rakhenge
+  answerJson  Json     
+  
+  isPinned    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("faq_items")
+}
+
+// ===========================================
+// dynamic contact us page manager
+// ===========================================
+
+model ContactFieldConfig {
+  id           String     @id @default(uuid())
+  fieldName    String     @unique // e.g., "customer_name", "phone_number"
+  label        String
+  placeholder  String?
+  fieldType    FieldType  @default(TEXT)
+  gridWidth    GridWidth  @default(FULL)
+  isRequired   Boolean    @default(true)
+  sortOrder    Int        @default(0) // dynamic ordering handle karne ke liye
+  prefixIcon   String?    // e.g., "📞", "📧"
+  postfixText  String?    // e.g., "INR", "KG"
+  options      Json?      // Agar type SELECT hai to configuration values array -> ["Sales", "Support"]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model ContactSubmission {
+  id          String   @id @default(uuid())
+  formData    Json     // Saare custom fields ka structured dynamic key-value string data save hoga
+  status      String   @default("PENDING") // PENDING, REVIEWED, RESOLVED
+  createdAt   DateTime @default(now())
+}
+
+model ContactSystemSettings {
+  id                  String   @id @default(uuid())
+  pageMaxWidth        String   @default("max-w-6xl") // max-w-4xl, max-w-6xl, max-w-7xl
+  companyMailId       String   @default("procurement.desk@sbsgroups.com")
+  notifyCompany       Boolean  @default(true)
+  notifyUser          Boolean  @default(true)
+  companyMailTemplate String   @db.Text // Admin custom variables like {{name}}, {{message}}
+  userThankYouTemplate String  @db.Text // Thank you message copy layout
+  alertSuccessMessage String   @default("Thank you! Your enquiry has been routed securely.")
+  mapEmbedUrl         String   @db.Text
+  updatedAt           DateTime @updatedAt
+}
+
+model CorporateHotline {
+  id          String   @id @default(uuid())
+  name        String
+  designation String
+  phone       String
+  email       String
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+}

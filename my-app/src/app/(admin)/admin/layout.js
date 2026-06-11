@@ -41,11 +41,14 @@ export default function AdminLayout({ children }) {
   ];
 
   const navMenus = [
-    { name: "Overview Dashboard", icon: "📊", href: "/admin/dashboard" },
-    { name: "Inventory Systems", icon: "📦", href: "#" },
-    { name: "B2B Partner Requests", icon: "🤝", href: "#" },
-    { name: "Order Dispatches", icon: "🚚", href: "#" },
-    { name: "System Settings Logs", icon: "🛠️", href: "#" }
+    { name: "Dashboard", icon: "📊", href: "/admin/dashboard" },
+    { name: "Contact Settings", icon: "📦", href: "/admin/contact-settings" },
+    { name: "FAQ Manager", icon: "🤝", href: "/admin/faq-manager" },
+    { name: "faqs", icon: "🚚", href: "/admin/faqs" },
+    { name: "employees", icon: "🛠️", href: "/admin/employees" },
+    { name: "carousel", icon: "🛠️", href: "/admin/carousel" },
+    { name: "brands", icon: "🛠️", href: "/admin/brands" },
+    { name: "clients", icon: "🛠️", href: "/admin/clients" }
   ];
 
   const headerThemeStyle = isGradient 
