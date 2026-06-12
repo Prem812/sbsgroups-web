@@ -36,7 +36,7 @@ export default function Footer() {
               {/* Dummy Logo block frame matching brand logo aspect */}
               <div className="bg-white/10 p-2 rounded-md border border-white/5 backdrop-blur-sm">
                 <span className="text-xl font-black tracking-tight text-white">
-                  SBS <span className="text-lime-500">35</span>
+                  SBS <span className="text-lime-500">groups</span>
                 </span>
               </div>
             </div>

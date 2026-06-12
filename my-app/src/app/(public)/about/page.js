@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import CorporateJourney from "@/components/CorporateJourney";
 
 export default function PublicAboutUsCompleteHub() {
   // SIMULATING ENTIRE DATA BUNDLE FETCHED DYNAMICALLY FROM ADMIN CMS SETUPS
@@ -9,12 +10,6 @@ export default function PublicAboutUsCompleteHub() {
     team: [
       { name: "Rahul Jaiswal", designation: "Chief Operating Officer", avatar: "👨‍💻" },
       { name: "Suresh Pandey", designation: "Lead Metallurgical Auditor", avatar: "👨‍🔧" }
-    ],
-    // ⏳ Chronological Timeline Matrices
-    journey: [
-      { year: "2018", title: "Foundational Origin Hub", desc: "Started operations inside Singrauli grid with single milling supply node." },
-      { year: "2022", title: "NCL Premium Authorization", desc: "Formally onboarded as certified high-tonnage spare components partner." },
-      { year: "2026", title: "Automated Supply Scaling", desc: "Deployed digital pipeline index mapping covering 50+ enterprise production sites." }
     ],
     // 📊 Milestone counter logs
     metrics: { globalClients: "140+", activeProducts: "1,250+", authorizedDistributors: "18+ Nodes" },
@@ -56,24 +51,6 @@ export default function PublicAboutUsCompleteHub() {
                   <h4 className="text-xs font-black text-slate-900">{member.name}</h4>
                   <p className="text-[10px] text-blue-900 font-bold uppercase tracking-tight">{member.designation}</p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* --- ⏳ NEW ATTACHMENT NODE: CHRONOLOGICAL JOURNEY TIMELINE --- */}
-        <div className="space-y-6 bg-white p-6 md:p-8 rounded-3xl border shadow-sm">
-          <div>
-            <h2 className="text-sm font-black uppercase text-slate-900 tracking-tight">Our Enterprise Evolution Log</h2>
-            <p className="text-[11px] text-slate-400 font-medium">Tracing historical infrastructure milestones year over year.</p>
-          </div>
-          <div className="relative border-l-2 border-slate-200 ml-2 pl-4 space-y-6">
-            {aboutCmsConfig.journey.map((milestone, idx) => (
-              <div key={idx} className="relative group">
-                <div className="absolute -left-[25px] top-0.5 w-3 h-3 bg-slate-900 rounded-full ring-4 ring-white transition-all group-hover:bg-blue-900" />
-                <span className="text-xs font-mono font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{milestone.year} Milestone</span>
-                <h3 className="text-xs font-black text-slate-900 mt-1.5">{milestone.title}</h3>
-                <p className="text-[11px] text-slate-500 font-medium leading-relaxed max-w-xl mt-0.5">{milestone.desc}</p>
               </div>
             ))}
           </div>
@@ -124,6 +101,8 @@ export default function PublicAboutUsCompleteHub() {
             ))}
           </div>
         </div>
+
+        <CorporateJourney />
 
         {/* --- ⭐ NEW ATTACHMENT NODE: DYNAMIC SYNCHRONIZED TESTIMONIALS STRIP --- */}
         <div className="bg-white border p-6 md:p-8 rounded-3xl shadow-sm space-y-4">

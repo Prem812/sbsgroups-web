@@ -1,705 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function PublicProductsCatalog() {
-  // ENHANCED CATEGORY STRUCTURE WITH COMPREHENSIVE PRODUCT DETAILS
-  const [categories] = useState([
-    {
-      id: "cat-1",
-      name: "Hand Tools",
-      icon: "🔧",
-      subcategories: [
-        {
-          id: "subcat-1",
-          name: "Wrenches",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9001",
-              name: "Adjustable Wrench (10-inch)",
-              specification: "Chrome plated, Anti-slip grip",
-              zone: "Singrauli Main Hub",
-              brand: "Channellock",
-              manufacturer: "Channellock Inc., USA",
-              material: "Chrome Plated Carbon Steel",
-              weight: "450g",
-              dimensions: { height: "10 inches", width: "2 inches", depth: "0.5 inches" },
-              capacity: "Up to 1.125 inches",
-              certifications: ["ISO 6913", "BS 4757"],
-              images: [
-                { url: "https://images.unsplash.com/photo-1578926078328-123456789?w=500&h=500", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Side+View", angle: "Side View" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Top+View", angle: "Top View" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Detail", angle: "Grip Detail" }
-              ]
-            },
-            {
-              id: "SKU-9002",
-              name: "Set of Combination Wrenches (6-32mm)",
-              specification: "SAE & Metric, Mirror polished",
-              zone: "NCL Spares Depot",
-              brand: "Stahlwille",
-              manufacturer: "Stahlwille Tools, Germany",
-              material: "Chrome Vanadium Steel",
-              weight: "1.8kg",
-              dimensions: { height: "220mm", width: "100mm", depth: "50mm" },
-              capacity: "6-32mm range",
-              certifications: ["ISO 691", "DIN 3110", "BS 4757"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Set+View", angle: "Full Set View" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Set+Sizes", angle: "Size Range" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Set+Close", angle: "Close-up" },
-                { url: "https://via.placeholder.com/500x500?text=Wrench+Set+Detail", angle: "Polish Detail" }
-              ]
-            },
-            {
-              id: "SKU-9003",
-              name: "Pipe Wrench Heavy Duty (18-inch)",
-              specification: "Iron casting, Serrated jaws",
-              zone: "Korba Hub",
-              brand: "Ridgid",
-              manufacturer: "Ridgid Inc., USA",
-              material: "Iron Casting with Serrated Jaws",
-              weight: "1.2kg",
-              dimensions: { height: "18 inches", width: "3 inches", depth: "1 inch" },
-              capacity: "Pipe size up to 2 inches",
-              certifications: ["UL Certified", "ANSI B107.14"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Pipe+Wrench+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Pipe+Wrench+Jaws", angle: "Jaw Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Pipe+Wrench+Open", angle: "Open Position" },
-                { url: "https://via.placeholder.com/500x500?text=Pipe+Wrench+Scale", angle: "Size Reference" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "subcat-2",
-          name: "Sockets & Ratchets",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9004",
-              name: "Socket Set 1/2-inch Drive (40 Pieces)",
-              specification: "Chrome vanadium steel, Metric & SAE",
-              zone: "Singrauli Main Hub",
-              brand: "Snap-on",
-              manufacturer: "Snap-on Inc., USA",
-              material: "Chrome Vanadium Steel",
-              weight: "3.5kg",
-              dimensions: { height: "250mm", width: "200mm", depth: "100mm" },
-              capacity: "1/2-inch drive, 8-32mm sockets",
-              certifications: ["ISO 3123", "ANSI B107.1"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Socket+Set+Complete", angle: "Complete Set" },
-                { url: "https://via.placeholder.com/500x500?text=Socket+Set+Sizes", angle: "Size Variety" },
-                { url: "https://via.placeholder.com/500x500?text=Socket+Set+Case", angle: "Storage Case" },
-                { url: "https://via.placeholder.com/500x500?text=Socket+Individual", angle: "Individual Socket" }
-              ]
-            },
-            {
-              id: "SKU-9005",
-              name: "Torque Wrench Click Type 1/2-inch",
-              specification: "Range 42-210 N·m, Calibrated",
-              zone: "NCL Spares Depot",
-              brand: "Sata",
-              manufacturer: "Sata Tools, Taiwan",
-              material: "Alloy Steel",
-              weight: "680g",
-              dimensions: { height: "350mm", width: "35mm", depth: "30mm" },
-              capacity: "42-210 N·m (30-155 ft-lbs)",
-              certifications: ["ISO 6789", "DIN 912"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Torque+Wrench+Full", angle: "Full Length" },
-                { url: "https://via.placeholder.com/500x500?text=Torque+Wrench+Head", angle: "Head Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Torque+Wrench+Scale", angle: "Scale View" },
-                { url: "https://via.placeholder.com/500x500?text=Torque+Wrench+Handle", angle: "Handle Detail" }
-              ]
-            },
-            {
-              id: "SKU-9006",
-              name: "Ratchet Handle 3/8-inch 72-Tooth",
-              specification: "Quick release, Polished finish",
-              zone: "Korba Hub",
-              brand: "Wera",
-              manufacturer: "Wera Werkzeuge, Germany",
-              material: "Chrome Plated Alloy Steel",
-              weight: "280g",
-              dimensions: { height: "180mm", width: "20mm", depth: "15mm" },
-              capacity: "3/8-inch drive",
-              certifications: ["ISO 3315", "DIN 3122"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Ratchet+Complete", angle: "Full View" },
-                { url: "https://via.placeholder.com/500x500?text=Ratchet+Head", angle: "Head View" },
-                { url: "https://via.placeholder.com/500x500?text=Ratchet+Release", angle: "Quick Release" },
-                { url: "https://via.placeholder.com/500x500?text=Ratchet+Finish", angle: "Polish Detail" }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "cat-2",
-      name: "Power Tools",
-      icon: "⚡",
-      subcategories: [
-        {
-          id: "subcat-3",
-          name: "Drills & Drivers",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9007",
-              name: "Corded Impact Drill 850W",
-              specification: "Variable speed, Metal chuck",
-              zone: "Singrauli Main Hub",
-              brand: "Bosch",
-              manufacturer: "Bosch Tools, Germany",
-              material: "Metal Body with Rubber Grip",
-              weight: "2.1kg",
-              dimensions: { height: "200mm", width: "90mm", depth: "80mm" },
-              capacity: "13mm chuck",
-              wattage: "850W",
-              certifications: ["CE Mark", "GS Certified", "IS 5194"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Drill+Front+View", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+Side+View", angle: "Side View" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+Chuck+Detail", angle: "Chuck Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+In+Use", angle: "Action View" }
-              ]
-            },
-            {
-              id: "SKU-9008",
-              name: "Cordless Drill-Driver 20V Li-ion",
-              specification: "2-speed transmission, Compact design",
-              zone: "NCL Spares Depot",
-              brand: "DeWalt",
-              manufacturer: "DeWalt, USA",
-              material: "Polymer Composite Housing",
-              weight: "1.5kg",
-              dimensions: { height: "180mm", width: "85mm", depth: "75mm" },
-              capacity: "10mm chuck",
-              wattage: "400W (equivalent)",
-              certifications: ["CE Mark", "UL Listed"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Cordless+Drill+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Cordless+Drill+Battery", angle: "Battery View" },
-                { url: "https://via.placeholder.com/500x500?text=Cordless+Drill+Chuck", angle: "Chuck Close-up" },
-                { url: "https://via.placeholder.com/500x500?text=Cordless+Drill+Controls", angle: "Control Panel" }
-              ]
-            },
-            {
-              id: "SKU-9009",
-              name: "Drill Bit Set HSS 1-10mm (50pcs)",
-              specification: "Titanium coated, Precision ground",
-              zone: "Korba Hub",
-              brand: "Irwin",
-              manufacturer: "Irwin Industrial Tools, USA",
-              material: "High Speed Steel (HSS) Titanium Coated",
-              weight: "450g",
-              dimensions: { height: "180mm", width: "120mm", depth: "80mm" },
-              capacity: "1-10mm range, 50 pieces",
-              certifications: ["ISO 1412", "DIN 338"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Drill+Bits+Set+Full", angle: "Complete Set" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+Bits+Organized", angle: "Organized View" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+Bits+Individual", angle: "Individual Bit" },
-                { url: "https://via.placeholder.com/500x500?text=Drill+Bits+Coating", angle: "Titanium Coating" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "subcat-4",
-          name: "Grinders & Saws",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9010",
-              name: "Angle Grinder 4.5-inch 950W",
-              specification: "Guard included, Soft start",
-              zone: "Singrauli Main Hub",
-              brand: "Makita",
-              manufacturer: "Makita Corporation, Japan",
-              material: "Metal Body with Soft Grip",
-              weight: "1.8kg",
-              dimensions: { height: "200mm", width: "140mm", depth: "120mm" },
-              capacity: "115mm disc (4.5-inch)",
-              wattage: "950W",
-              certifications: ["CE Mark", "IS 5194", "GS Certified"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Angle+Grinder+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Angle+Grinder+Guard", angle: "Guard Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Angle+Grinder+Side", angle: "Side View" },
-                { url: "https://via.placeholder.com/500x500?text=Angle+Grinder+Disc", angle: "Disc Area" }
-              ]
-            },
-            {
-              id: "SKU-9011",
-              name: "Circular Saw 7.25-inch 1500W",
-              specification: "Laser guide, Dust blower",
-              zone: "NCL Spares Depot",
-              brand: "Festool",
-              manufacturer: "Festool GmbH, Germany",
-              material: "Magnesium Alloy Housing",
-              weight: "2.4kg",
-              dimensions: { height: "220mm", width: "180mm", depth: "150mm" },
-              capacity: "185mm blade (7.25-inch)",
-              wattage: "1500W",
-              certifications: ["CE Mark", "GS Certified"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Circular+Saw+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Circular+Saw+Blade", angle: "Blade View" },
-                { url: "https://via.placeholder.com/500x500?text=Circular+Saw+Laser", angle: "Laser Guide" },
-                { url: "https://via.placeholder.com/500x500?text=Circular+Saw+Handle", angle: "Handle Detail" }
-              ]
-            },
-            {
-              id: "SKU-9012",
-              name: "Grinding Disc 4.5x6mm (10pcs)",
-              specification: "For metal, Stone & Steel",
-              zone: "Korba Hub",
-              brand: "3M",
-              manufacturer: "3M Abrasive Systems, USA",
-              material: "Aluminum Oxide Abrasive",
-              weight: "200g",
-              dimensions: { height: "115mm", width: "115mm", depth: "6mm" },
-              capacity: "115mm × 6mm discs, 10 pieces",
-              certifications: ["ISO 12413", "ANSI B24.1"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Grinding+Disc+Pack", angle: "Pack View" },
-                { url: "https://via.placeholder.com/500x500?text=Grinding+Disc+Stack", angle: "Stacked View" },
-                { url: "https://via.placeholder.com/500x500?text=Grinding+Disc+Surface", angle: "Surface Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Grinding+Disc+Edge", angle: "Edge View" }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "cat-3",
-      name: "Safety Equipment",
-      icon: "🦺",
-      subcategories: [
-        {
-          id: "subcat-5",
-          name: "Protective Gear",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9021",
-              name: "Industrial Safety Leather Boots (Grade A)",
-              specification: "Steel toe, Anti-slip sole",
-              zone: "Singrauli Main Hub",
-              brand: "Timberland PRO",
-              manufacturer: "Timberland Company, USA",
-              material: "Premium Leather with Steel Toe Cap",
-              weight: "650g (pair)",
-              dimensions: { height: "200mm", width: "100mm", depth: "80mm" },
-              capacity: "Steel toe protection up to 200J",
-              certifications: ["IS 1035", "CE 344:2004"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Safety+Boots+Pair", angle: "Full Pair" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Boots+Side", angle: "Side View" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Boots+Toe", angle: "Steel Toe Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Boots+Sole", angle: "Anti-slip Sole" }
-              ]
-            },
-            {
-              id: "SKU-9022",
-              name: "Safety Helmet ABS Yellow",
-              specification: "Impact resistant, Adjustable headband",
-              zone: "NCL Spares Depot",
-              brand: "Karam",
-              manufacturer: "Karam Industries, India",
-              material: "ABS Plastic Shell with EPS Liner",
-              weight: "320g",
-              dimensions: { height: "220mm", width: "260mm", depth: "200mm" },
-              capacity: "Impact protection up to 200 Joules",
-              certifications: ["IS 2925", "CE 397"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Safety+Helmet+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Helmet+Side", angle: "Side View" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Helmet+Interior", angle: "Interior Padding" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Helmet+Headband", angle: "Adjustable Band" }
-              ]
-            },
-            {
-              id: "SKU-9023",
-              name: "Safety Goggles Anti-fog Clear Lens",
-              specification: "Polycarbonate, UV protection",
-              zone: "Korba Hub",
-              brand: "Uvex",
-              manufacturer: "Uvex Group, Germany",
-              material: "Polycarbonate Lens with Soft Frame",
-              weight: "85g",
-              dimensions: { height: "80mm", width: "160mm", depth: "70mm" },
-              capacity: "UV 400 protection",
-              certifications: ["IS 1835", "CE 166"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Safety+Goggles+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Goggles+Lens", angle: "Lens Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Goggles+Side", angle: "Side Profile" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Goggles+Coated", angle: "Anti-fog Coating" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "subcat-6",
-          name: "Electrical Safety",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-3112",
-              name: "Insulated Electrical Rubber Gloves (Class 3)",
-              specification: "Working voltage 26,500V AC, Proof tested",
-              zone: "NCL Spares Depot",
-              brand: "Ansell",
-              manufacturer: "Ansell Limited, Australia",
-              material: "Natural Rubber with Canvas Backing",
-              weight: "250g (pair)",
-              dimensions: { height: "350mm", width: "150mm", depth: "80mm" },
-              capacity: "Class 3 - 26,500V AC",
-              certifications: ["IS 6050", "IEC 60903", "EN 60903"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Safety+Gloves+Pair", angle: "Full Pair" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Gloves+Single", angle: "Single Glove" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Gloves+Texture", angle: "Grip Texture" },
-                { url: "https://via.placeholder.com/500x500?text=Safety+Gloves+Detail", angle: "Material Detail" }
-              ]
-            },
-            {
-              id: "SKU-9024",
-              name: "Insulated Screwdriver Set (6pcs)",
-              specification: "1000V rated, Cushioned grip",
-              zone: "Singrauli Main Hub",
-              brand: "Wiha",
-              manufacturer: "Wiha Tools, Germany",
-              material: "Chrome Vanadium with Insulation",
-              weight: "450g",
-              dimensions: { height: "280mm", width: "120mm", depth: "60mm" },
-              capacity: "1000V rated, 6-piece set",
-              certifications: ["IS 2848", "CE 1010", "IEC 60900"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Screwdriver+Set+Full", angle: "Complete Set" },
-                { url: "https://via.placeholder.com/500x500?text=Screwdriver+Set+Individual", angle: "Individual Tool" },
-                { url: "https://via.placeholder.com/500x500?text=Screwdriver+Set+Grip", angle: "Grip Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Screwdriver+Set+Tips", angle: "Tip Variety" }
-              ]
-            },
-            {
-              id: "SKU-9025",
-              name: "Live Wire Detector Non-contact",
-              specification: "12-1000V detection range, LED indicator",
-              zone: "Korba Hub",
-              brand: "Fluke",
-              manufacturer: "Fluke Corporation, USA",
-              material: "ABS Plastic with Metal Tip",
-              weight: "120g",
-              dimensions: { height: "180mm", width: "45mm", depth: "35mm" },
-              capacity: "12-1000V AC detection",
-              wattage: "Battery powered",
-              certifications: ["CE Mark", "UL Listed"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Wire+Detector+Full", angle: "Full View" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Detector+Tip", angle: "Detection Tip" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Detector+LED", angle: "LED Indicator" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Detector+Controls", angle: "Control Button" }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "cat-4",
-      name: "Chemicals & Lubricants",
-      icon: "🧪",
-      subcategories: [
-        {
-          id: "subcat-7",
-          name: "Lubricants & Oils",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-4412",
-              name: "High-Pressure Hydraulic Lubrication Pump 10L",
-              specification: "Max pressure 400 Bar, 3-Phase motor",
-              zone: "NCL Spares Depot",
-              brand: "Eaton",
-              manufacturer: "Eaton Hydraulics, USA",
-              material: "Cast Iron Pump Body",
-              weight: "8.5kg",
-              dimensions: { height: "350mm", width: "280mm", depth: "200mm" },
-              capacity: "10L reservoir",
-              wattage: "0.75kW motor",
-              certifications: ["ISO 4414", "CE Mark"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Hydraulic+Pump+Full", angle: "Full Assembly" },
-                { url: "https://via.placeholder.com/500x500?text=Hydraulic+Pump+Top", angle: "Top View" },
-                { url: "https://via.placeholder.com/500x500?text=Hydraulic+Pump+Valve", angle: "Valve Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Hydraulic+Pump+Motor", angle: "Motor View" }
-              ]
-            },
-            {
-              id: "SKU-9026",
-              name: "Machine Oil Premium Grade 20L",
-              specification: "ISO VG 46, Anti-oxidant",
-              zone: "Singrauli Main Hub",
-              brand: "Shell",
-              manufacturer: "Shell Global, Netherlands",
-              material: "Mineral Oil Blend",
-              weight: "20.5kg",
-              dimensions: { height: "350mm", width: "280mm", depth: "200mm" },
-              capacity: "20 liters",
-              certifications: ["ISO 6743", "ASTM D4378"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Machine+Oil+Canister", angle: "Product Canister" },
-                { url: "https://via.placeholder.com/500x500?text=Machine+Oil+Label", angle: "Label Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Machine+Oil+Pour", angle: "Pouring View" },
-                { url: "https://via.placeholder.com/500x500?text=Machine+Oil+Clarity", angle: "Oil Clarity" }
-              ]
-            },
-            {
-              id: "SKU-9027",
-              name: "Grease Multi-purpose NLGI 2 (400g)",
-              specification: "EP additives, Water resistant",
-              zone: "Korba Hub",
-              brand: "Mobil",
-              manufacturer: "Mobil Corporation, USA",
-              material: "Lithium Complex Soap Grease",
-              weight: "420g",
-              dimensions: { height: "100mm", width: "80mm", depth: "80mm" },
-              capacity: "400g cartridge",
-              certifications: ["NLGI Grade 2", "ISO 6743"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Grease+Container", angle: "Product Container" },
-                { url: "https://via.placeholder.com/500x500?text=Grease+Texture", angle: "Grease Texture" },
-                { url: "https://via.placeholder.com/500x500?text=Grease+Dispense", angle: "Dispensing" },
-                { url: "https://via.placeholder.com/500x500?text=Grease+Application", angle: "Application View" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "subcat-8",
-          name: "Cleaning & Maintenance",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-8821",
-              name: "Aerosol Anti-Rust Spray Premium (Case of 24)",
-              specification: "Moisture displacement, 400ml cans",
-              zone: "Singrauli Main Hub",
-              brand: "WD-40",
-              manufacturer: "WD-40 Company, USA",
-              material: "Aerosol Spray Formulation",
-              weight: "9.6kg (24 cans)",
-              dimensions: { height: "200mm", width: "180mm", depth: "150mm" },
-              capacity: "400ml × 24 cans",
-              certifications: ["ISO 6743", "ASTM D1003"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Anti+Rust+Spray+Case", angle: "Case View" },
-                { url: "https://via.placeholder.com/500x500?text=Anti+Rust+Spray+Can", angle: "Single Can" },
-                { url: "https://via.placeholder.com/500x500?text=Anti+Rust+Spray+Nozzle", angle: "Spray Nozzle" },
-                { url: "https://via.placeholder.com/500x500?text=Anti+Rust+Spray+Label", angle: "Label Detail" }
-              ]
-            },
-            {
-              id: "SKU-9028",
-              name: "Degreaser Industrial Strength 5L",
-              specification: "Biodegradable, Fast acting",
-              zone: "NCL Spares Depot",
-              brand: "Castrol",
-              manufacturer: "Castrol Limited, UK",
-              material: "Alkaline Degreasing Concentrate",
-              weight: "5.2kg",
-              dimensions: { height: "280mm", width: "200mm", depth: "150mm" },
-              capacity: "5 liters",
-              certifications: ["ISO 6743", "REACH Compliant"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Degreaser+Container", angle: "Container View" },
-                { url: "https://via.placeholder.com/500x500?text=Degreaser+Label", angle: "Label Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Degreaser+Dilution", angle: "Dilution Chart" },
-                { url: "https://via.placeholder.com/500x500?text=Degreaser+Action", angle: "Cleaning Action" }
-              ]
-            },
-            {
-              id: "SKU-9029",
-              name: "Metal Cleaner Polish 500ml",
-              specification: "Stainless steel safe, Streak-free",
-              zone: "Korba Hub",
-              brand: "3M",
-              manufacturer: "3M Company, USA",
-              material: "Abrasive Cleaning Compound",
-              weight: "530ml",
-              dimensions: { height: "180mm", width: "80mm", depth: "60mm" },
-              capacity: "500ml bottle",
-              certifications: ["ISO 6743", "ASTM D2240"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Metal+Polish+Bottle", angle: "Bottle View" },
-                { url: "https://via.placeholder.com/500x500?text=Metal+Polish+Polish", angle: "Polish Texture" },
-                { url: "https://via.placeholder.com/500x500?text=Metal+Polish+Before", angle: "Before Cleaning" },
-                { url: "https://via.placeholder.com/500x500?text=Metal+Polish+After", angle: "After Polishing" }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "cat-5",
-      name: "Lifting & Rigging",
-      icon: "🪝",
-      subcategories: [
-        {
-          id: "subcat-9",
-          name: "Slings & Webbing",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-1094",
-              name: "Heavy Duty Lifting Textile Webbing Sling 5T",
-              specification: "Duplex factor 7:1, Polyester material",
-              zone: "Korba Hub",
-              brand: "Cortland",
-              manufacturer: "Cortland Limited, USA",
-              material: "High-Strength Polyester Webbing",
-              weight: "1.8kg",
-              dimensions: { height: "1.5m", width: "100mm", depth: "20mm" },
-              capacity: "5 tonne safe working load",
-              certifications: ["ISO 7189", "EN 1492"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Webbing+Sling+Full", angle: "Full Length" },
-                { url: "https://via.placeholder.com/500x500?text=Webbing+Sling+Weave", angle: "Weave Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Webbing+Sling+Eye", angle: "Eye Loop" },
-                { url: "https://via.placeholder.com/500x500?text=Webbing+Sling+Stitching", angle: "Stitching Detail" }
-              ]
-            },
-            {
-              id: "SKU-9030",
-              name: "Chain Sling Grade 100 5T",
-              specification: "Alloy steel, Calibrated links",
-              zone: "Singrauli Main Hub",
-              brand: "Pewag",
-              manufacturer: "Pewag Group, Austria",
-              material: "Alloy Steel Grade 100",
-              weight: "2.5kg",
-              dimensions: { height: "1.2m", width: "50mm", depth: "40mm" },
-              capacity: "5 tonne safe working load",
-              certifications: ["EN 818", "ISO 3077"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Chain+Sling+Full", angle: "Full Chain" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Sling+Link", angle: "Link Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Sling+Hook", angle: "Hook Assembly" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Sling+Marks", angle: "Grade Markings" }
-              ]
-            },
-            {
-              id: "SKU-9031",
-              name: "Wire Rope Sling 6x19 8mm 10T",
-              specification: "IWRC core, Certified safe working load",
-              zone: "NCL Spares Depot",
-              brand: "Bridon",
-              manufacturer: "Bridon International, UK",
-              material: "Steel Wire Rope 6×19 IWRC",
-              weight: "3.2kg",
-              dimensions: { height: "1.5m", width: "8mm", depth: "8mm" },
-              capacity: "10 tonne safe working load",
-              certifications: ["ISO 2061", "EN 10017"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Wire+Rope+Full", angle: "Full Length" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Rope+Strands", angle: "Strand Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Rope+Termination", angle: "Termination" },
-                { url: "https://via.placeholder.com/500x500?text=Wire+Rope+Close", angle: "Close-up View" }
-              ]
-            }
-          ]
-        },
-        {
-          id: "subcat-10",
-          name: "Hoists & Pulleys",
-          productCount: 3,
-          products: [
-            {
-              id: "SKU-9032",
-              name: "Manual Chain Block 2T",
-              specification: "Load chain Grade 80, Swivel hook",
-              zone: "Korba Hub",
-              brand: "Kito",
-              manufacturer: "Kito Corporation, Japan",
-              material: "Ductile Iron Body",
-              weight: "4.5kg",
-              dimensions: { height: "180mm", width: "150mm", depth: "120mm" },
-              capacity: "2 tonne lift capacity",
-              certifications: ["ISO 4488", "EN 14491"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Chain+Block+Full", angle: "Full Unit" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Block+Hook", angle: "Hook Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Block+Chain", angle: "Load Chain" },
-                { url: "https://via.placeholder.com/500x500?text=Chain+Block+Handle", angle: "Handle View" }
-              ]
-            },
-            {
-              id: "SKU-9033",
-              name: "Pulley Steel 4-inch Fixed Eye",
-              specification: "Ball bearing, Powder coated",
-              zone: "Singrauli Main Hub",
-              brand: "Harrington",
-              manufacturer: "Harrington Hoists, USA",
-              material: "Steel Body with Ball Bearing",
-              weight: "2.8kg",
-              dimensions: { height: "120mm", width: "100mm", depth: "80mm" },
-              capacity: "2 tonne working load",
-              certifications: ["ASME B29.1", "EN 14491"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Pulley+Front", angle: "Front View" },
-                { url: "https://via.placeholder.com/500x500?text=Pulley+Side", angle: "Side Profile" },
-                { url: "https://via.placeholder.com/500x500?text=Pulley+Eye", angle: "Eye Loop" },
-                { url: "https://via.placeholder.com/500x500?text=Pulley+Bearing", angle: "Ball Bearing" }
-              ]
-            },
-            {
-              id: "SKU-9034",
-              name: "Come-Along Tool 2T Mechanical",
-              specification: "Dual pawl, Ratchet operation",
-              zone: "NCL Spares Depot",
-              brand: "Coffing",
-              manufacturer: "Coffing Hoists, USA",
-              material: "Cast Iron with Steel Pawls",
-              weight: "3.5kg",
-              dimensions: { height: "250mm", width: "120mm", depth: "100mm" },
-              capacity: "2 tonne pull capacity",
-              certifications: ["ASME B30.20", "EN 14491"],
-              images: [
-                { url: "https://via.placeholder.com/500x500?text=Come+Along+Full", angle: "Full Assembly" },
-                { url: "https://via.placeholder.com/500x500?text=Come+Along+Lever", angle: "Lever Detail" },
-                { url: "https://via.placeholder.com/500x500?text=Come+Along+Pawl", angle: "Pawl Mechanism" },
-                { url: "https://via.placeholder.com/500x500?text=Come+Along+Hook", angle: "Hook Assembly" }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]);
+// ✅ DATA NOW LIVES IN A SEPARATE FILE — single source of truth
+import { categories, getAllFlattenedProducts } from "@/data/products";
 
-  // STATE CONTROLS FOR THE B2B QUOTATION CART
+function ProductsCatalogContent() {
+  const searchParams = useSearchParams();
+
+  // LIVE CAPTURE: Capture query string safely from the global layout header search bar input
+  const globalSearchQuery = searchParams.get("search") || "";
+
+  // FLAWFUL EXTRACT: Compiles flat list of all items across hierarchy for flawless filtering matrix
+  const allFlattenedProducts = useMemo(() => getAllFlattenedProducts(), []);
+
+  // STATE CONTROLS FOR THE B2B QUOTATION CART (100% Unchanged)
   const [rfqCart, setRfqCart] = useState([]);
-  const [quantities, setQuantities] = useState({}); // Tracks quantity input per product id
+  const [quantities, setQuantities] = useState({});
   const [showFormModal, setShowFormModal] = useState(false);
-  
-  // SIDEBAR NAVIGATION STATE
-  const [expandedCategories, setExpandedCategories] = useState({}); // Track which categories are expanded
-  const [selectedItems, setSelectedItems] = useState({}); // Track selected categories/subcategories
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const [selectedItems, setSelectedItems] = useState({});
 
-  // USER DETAILS FORM STATES
+  // USER DETAILS FORM STATES (100% Unchanged)
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -708,7 +32,6 @@ export default function PublicProductsCatalog() {
     remarks: ""
   });
 
-  // Toggle category expansion in sidebar
   const handleToggleCategory = (categoryId) => {
     setExpandedCategories(prev => ({
       ...prev,
@@ -716,35 +39,30 @@ export default function PublicProductsCatalog() {
     }));
   };
 
-  // Toggle category selection
   const handleSelectCategory = (categoryId) => {
     setSelectedItems(prev => {
       const updated = { ...prev };
+      const category = categories.find(c => c.id === categoryId);
+
       if (updated[categoryId]) {
         delete updated[categoryId];
-        // Remove all subcategories of this category
-        const category = categories.find(c => c.id === categoryId);
         if (category) {
           category.subcategories.forEach(sub => {
             delete updated[sub.id];
           });
         }
       } else {
-        // Select all subcategories when category is selected
-        const category = categories.find(c => c.id === categoryId);
+        updated[categoryId] = true;
         if (category) {
-          updated[categoryId] = true;
           category.subcategories.forEach(sub => {
             updated[sub.id] = true;
           });
         }
       }
-      updateFilteredProducts(updated);
       return updated;
     });
   };
 
-  // Toggle subcategory selection
   const handleSelectSubcategory = (categoryId, subcategoryId) => {
     setSelectedItems(prev => {
       const updated = { ...prev };
@@ -753,83 +71,85 @@ export default function PublicProductsCatalog() {
       } else {
         updated[subcategoryId] = true;
       }
-      updateFilteredProducts(updated);
+
+      const category = categories.find(c => c.id === categoryId);
+      if (category) {
+        const allChecked = category.subcategories.every(sub => updated[sub.id]);
+        if (allChecked) {
+          updated[categoryId] = true;
+        } else {
+          delete updated[categoryId];
+        }
+      }
       return updated;
     });
   };
 
-  // Update filtered products based on selected items
-  const updateFilteredProducts = (selected) => {
-    const products = [];
-    Object.keys(selected).forEach(itemId => {
-      categories.forEach(category => {
-        category.subcategories.forEach(subcategory => {
-          if (subcategory.id === itemId) {
-            products.push(...subcategory.products);
-          }
-        });
-      });
-    });
-    setFilteredProducts(products);
-  };
-
-  // Get the count of selected items
   const getSelectedCount = () => {
-    return Object.keys(selectedItems).length;
+    return Object.keys(selectedItems).filter(key => key.startsWith("subcat-")).length;
   };
 
-  // Handle local quantity field typing changes
   const handleQtyChange = (productId, value) => {
-    const qty = parseInt(value) || 1;
+    const qty = Math.max(1, parseInt(value) || 1);
     setQuantities(prev => ({ ...prev, [productId]: qty }));
   };
 
-  // Add Item with specified quantity directly to RFQ Bucket
   const addToRfqCart = (product) => {
     const selectedQty = quantities[product.id] || 1;
-    
     setRfqCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
       if (existingItem) {
-        // If already added, update the requested units count
-        return prevCart.map(item => 
+        return prevCart.map(item =>
           item.id === product.id ? { ...item, quantity: selectedQty } : item
         );
       }
       return [...prevCart, { ...product, quantity: selectedQty }];
     });
-
     alert(`Successfully appended ${selectedQty} units of ${product.id} to your Quote Bucket.`);
   };
 
-  // Remove Item from tracking cart array
   const removeFromCart = (id) => {
     setRfqCart(prev => prev.filter(item => item.id !== id));
   };
 
-  // Handle Submission Action for sending quotation logs via mail triggers
   const handleQuoteSubmission = (e) => {
     e.preventDefault();
-    
-    const quotePayload = {
-      client: formData,
-      requestedItems: rfqCart
-    };
-
+    const quotePayload = { client: formData, requestedItems: rfqCart };
     console.log("Dispatched RFQ Schema Matrix Payload:", quotePayload);
-    
-    alert(`Thank you, ${formData.fullName}! Your quotation request for ${rfqCart.length} item lines has been compiled. A detailed digital quotation slip is being dispatched to ${formData.email}. Our Singrauli executive will connect on ${formData.mobile}.`);
-    
-    // Clear state buckets post operational dispatch
+    alert(`Thank you, ${formData.fullName}! Your quotation request for ${rfqCart.length} item lines has been compiled.`);
     setRfqCart([]);
     setShowFormModal(false);
     setFormData({ fullName: "", email: "", mobile: "", companyName: "", remarks: "" });
   };
 
+  // ============================ NEW ADVANCED SEARCH ENGINE ENGINE ============================
+  const finalVisibleProducts = useMemo(() => {
+    const activeSubcatIds = Object.keys(selectedItems).filter(key => key.startsWith("subcat-"));
+    const query = globalSearchQuery.toLowerCase().trim();
+
+    return allFlattenedProducts.filter((product) => {
+      // Rule A: If sidebar filters are active, item must match selected subcategory
+      if (activeSubcatIds.length > 0 && !activeSubcatIds.includes(product.subCatId)) {
+        return false;
+      }
+      // Rule B: Match text filter against multiple item tags
+      if (query) {
+        return (
+          product.name.toLowerCase().includes(query) ||
+          product.id.toLowerCase().includes(query) ||
+          product.specification.toLowerCase().includes(query) ||
+          product.brand.toLowerCase().includes(query) ||
+          product.zone.toLowerCase().includes(query)
+        );
+      }
+      return true;
+    });
+  }, [allFlattenedProducts, selectedItems, globalSearchQuery]);
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans antialiased text-slate-800">
-      
-      {/* HEADER - FULL WIDTH */}
+
+      {/* HEADER SECTION */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -838,38 +158,35 @@ export default function PublicProductsCatalog() {
             <p className="text-xs text-slate-500 font-medium">Browse categories, select items, and request official dispatch quotes instantly.</p>
           </div>
 
-          {/* FLOATING BANNER BUCKET STATUS CONTROLLER */}
-          <button 
-            onClick={() => { if(rfqCart.length === 0) { alert("Your Quote bucket is currently empty. Please add items below."); return; } setShowFormModal(true); }}
+          <button
+            onClick={() => { if(rfqCart.length === 0) { alert("Your Quote bucket is empty."); return; } setShowFormModal(true); }}
             className="bg-blue-950 text-white font-bold text-xs px-5 py-3 rounded-xl uppercase tracking-wider shadow-lg flex items-center space-x-3 hover:bg-blue-900 transition-all transform active:scale-95 whitespace-nowrap"
           >
             <span>📋</span>
             <span>Quote Bucket</span>
-            <span className="bg-lime-400 text-slate-950 rounded-md px-1.5 py-0.5 font-black text-[10px] animate-pulse">
+            <span className="bg-lime-400 text-slate-950 rounded-md px-1.5 py-0.5 font-black text-[10px]">
               {rfqCart.length} Lines
             </span>
           </button>
         </div>
       </div>
 
-      {/* MAIN CONTAINER WITH SIDEBAR */}
-      <div className="flex gap-0">
-        
-        {/* ========== LEFT SIDEBAR ========== */}
+      {/* VIEW ENGINE LAYOUT CONTROLLER */}
+      <div className="flex flex-col md:flex-row gap-0">
+
+        {/* LEFT NAVIGATION SIDEBAR */}
         <div className="w-full md:w-80 bg-white border-r border-slate-200 overflow-y-auto max-h-[calc(100vh-140px)] sticky top-24">
           <div className="p-4">
             <div className="mb-4 pb-4 border-b border-slate-200">
               <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-2">Categories</h2>
               <p className="text-[10px] text-slate-500 font-medium">
-                Selected: <span className="font-black text-blue-900">{getSelectedCount()}</span>
+                Active Selection Tags: <span className="font-black text-blue-900">{getSelectedCount()}</span>
               </p>
             </div>
 
-            {/* CATEGORY LIST */}
             <div className="space-y-2">
               {categories.map((category) => (
                 <div key={category.id} className="space-y-1">
-                  {/* CATEGORY HEADER */}
                   <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 transition-colors">
                     <input
                       type="checkbox"
@@ -883,17 +200,12 @@ export default function PublicProductsCatalog() {
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{category.icon}</span>
-                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">
-                          {category.name}
-                        </span>
+                        <span className="text-xs font-black text-slate-900 uppercase tracking-wide">{category.name}</span>
                       </div>
-                      <span className="text-xs text-slate-400">
-                        {expandedCategories[category.id] ? "▼" : "▶"}
-                      </span>
+                      <span className="text-xs text-slate-400">{expandedCategories[category.id] ? "▼" : "▶"}</span>
                     </button>
                   </div>
 
-                  {/* SUBCATEGORIES */}
                   {expandedCategories[category.id] && (
                     <div className="pl-8 space-y-1">
                       {category.subcategories.map((subcategory) => (
@@ -904,12 +216,8 @@ export default function PublicProductsCatalog() {
                             onChange={() => handleSelectSubcategory(category.id, subcategory.id)}
                             className="w-3 h-3 rounded border-slate-300 cursor-pointer accent-blue-900"
                           />
-                          <label className="flex-1 text-left text-xs font-semibold text-slate-700 cursor-pointer hover:text-blue-900 transition-colors">
-                            {subcategory.name}
-                          </label>
-                          <span className="text-[9px] text-slate-500 font-medium">
-                            ({subcategory.productCount})
-                          </span>
+                          <span className="flex-1 text-xs font-semibold text-slate-700">{subcategory.name}</span>
+                          <span className="text-[9px] text-slate-500 font-medium">({subcategory.productCount})</span>
                         </div>
                       ))}
                     </div>
@@ -918,100 +226,62 @@ export default function PublicProductsCatalog() {
               ))}
             </div>
 
-            {/* CLEAR SELECTION BUTTON */}
             {getSelectedCount() > 0 && (
               <button
-                onClick={() => {
-                  setSelectedItems({});
-                  setFilteredProducts([]);
-                }}
-                className="w-full mt-6 text-xs font-bold text-slate-600 hover:text-slate-900 py-2 px-3 rounded-lg border border-slate-300 hover:border-slate-400 transition-colors"
+                onClick={() => setSelectedItems({})}
+                className="w-full mt-6 text-xs font-bold text-slate-600 hover:text-slate-900 py-2 px-3 rounded-lg border border-slate-300 transition-colors"
               >
-                ✕ Clear Selection
+                ✕ Clear Selection Filters
               </button>
             )}
           </div>
         </div>
 
-        {/* ========== MAIN CONTENT AREA ========== */}
+        {/* MAIN PRODUCT CATALOG REGION */}
         <div className="flex-1 p-4 md:p-8">
-          
-          {/* PRODUCTS HEADER */}
-          {getSelectedCount() > 0 && (
-            <div className="max-w-6xl mx-auto mb-8">
-              <h2 className="text-2xl font-black text-slate-900 mb-1">
-                {filteredProducts.length} Product{filteredProducts.length !== 1 ? "s" : ""} Available
+
+          {/* CRITERIA BAR SUMMARY OVERVIEW DISPLAY */}
+          <div className="max-w-6xl mx-auto mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-black text-slate-900">
+                {finalVisibleProducts.length} Match Line{finalVisibleProducts.length !== 1 ? "s" : ""} Available
               </h2>
-              <p className="text-slate-600 font-medium text-sm">
-                Select items and request quotes instantly
-              </p>
+              <p className="text-xs text-slate-400 font-semibold mt-0.5">Vetted heavy components aligned with selected parameters.</p>
             </div>
-          )}
 
-          {/* CATEGORIES SHOWCASE (When nothing selected) */}
-          {getSelectedCount() === 0 && (
-            <div className="max-w-6xl mx-auto">
-              <div className="mb-8">
-                <h2 className="text-2xl font-black text-slate-900 mb-1">Browse All Categories</h2>
-                <p className="text-slate-600 font-medium text-sm">
-                  Select categories from the sidebar or click below to view products
-                </p>
+            {globalSearchQuery && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-900 rounded-xl px-4 py-2 text-xs font-semibold flex items-center gap-2 self-start sm:self-center">
+                <span>Active Global Filter: <b className="font-black">"{globalSearchQuery}"</b></span>
+                <Link href="/products" className="text-red-500 hover:text-red-700 font-bold ml-2 border-l border-blue-200 pl-2 uppercase tracking-wide text-[10px]">
+                  Clear ×
+                </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => (
-                  <div
-                    key={category.id}
-                    onClick={() => handleSelectCategory(category.id)}
-                    className="bg-white border border-slate-200/80 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer shadow-sm hover:shadow-lg hover:border-blue-400 transition-all transform hover:scale-105"
-                  >
-                    <div className="text-6xl mb-4">{category.icon}</div>
-                    <h3 className="text-lg font-black text-slate-900 mb-2">{category.name}</h3>
-                    <p className="text-sm text-slate-500 font-medium mb-4">
-                      {category.subcategories.reduce((sum, sub) => sum + sub.productCount, 0)} Products
-                    </p>
-                    <div className="flex flex-wrap gap-1 justify-center mb-3">
-                      {category.subcategories.map((sub) => (
-                        <span key={sub.id} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-semibold">
-                          {sub.name}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 text-xs text-blue-600 font-semibold">Select Category →</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* PRODUCTS GRID */}
-          {getSelectedCount() > 0 && filteredProducts.length > 0 && (
+          {/* DYNAMIC FEED GRID */}
+          {finalVisibleProducts.length > 0 ? (
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => {
+              {finalVisibleProducts.map((product) => {
                 const currentInputQty = quantities[product.id] || 1;
                 const isAlreadyInCart = rfqCart.some(item => item.id === product.id);
 
                 return (
                   <div key={product.id} className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-              
-                    {/* Product Info Labels */}
                     <div>
                       <div className="flex justify-between items-center mb-3">
-                        <span className="text-[10px] font-mono font-bold text-slate-400">
-                          {product.id}
-                        </span>
+                        <span className="text-[10px] font-mono font-bold text-slate-400">{product.id}</span>
+                        <span className="text-[9px] font-black uppercase bg-slate-100 text-slate-600 px-2 py-0.5 rounded tracking-wide">{product.brand}</span>
                       </div>
                       <h3 className="text-sm font-black text-slate-900 tracking-tight group-hover:text-blue-900 transition-colors">
                         {product.name}
                       </h3>
-                      <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed font-medium">
-                        {product.specification}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-medium mt-1 flex items-center space-x-1">
+                      <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed font-medium">{product.specification}</p>
+                      <p className="text-[10px] text-slate-400 font-medium mt-2 flex items-center space-x-1">
                         <span>📍 Warehouse Node:</span> <span className="font-semibold text-slate-600">{product.zone}</span>
                       </p>
                     </div>
 
-                    {/* Price Reveal Block Interception (Policy Compliant: Hidden B2B rates) */}
                     <div className="mt-5 pt-4 border-t border-slate-100 flex flex-col space-y-3">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unit Value:</span>
@@ -1020,23 +290,21 @@ export default function PublicProductsCatalog() {
                         </span>
                       </div>
 
-                      {/* Quantitative input field & basket injection layout controls */}
                       <div className="flex items-center gap-2">
                         <div className="w-20 shrink-0">
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             min="1"
                             value={currentInputQty}
                             onChange={(e) => handleQtyChange(product.id, e.target.value)}
                             className="w-full text-center font-bold text-xs border border-slate-200 rounded-lg py-2 focus:outline-none focus:border-blue-950 bg-slate-50"
-                            title="Set Bulk Quantity Requirement"
                           />
                         </div>
-                        <button 
+                        <button
                           onClick={() => addToRfqCart(product)}
                           className={`flex-1 text-[10px] font-black uppercase tracking-wider py-2 rounded-lg transition-colors border ${
-                            isAlreadyInCart 
-                              ? "bg-lime-500 text-slate-900 border-lime-500" 
+                            isAlreadyInCart
+                              ? "bg-lime-500 text-slate-900 border-lime-500"
                               : "bg-slate-900 text-white hover:bg-slate-800 border-slate-900"
                           }`}
                         >
@@ -1044,7 +312,6 @@ export default function PublicProductsCatalog() {
                         </button>
                       </div>
 
-                      {/* View Details Button */}
                       <Link href={`/products/${product.id}`}>
                         <button className="w-full text-[10px] font-black text-blue-600 uppercase tracking-wider py-2 rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors">
                           👁️ View Details
@@ -1055,30 +322,30 @@ export default function PublicProductsCatalog() {
                 );
               })}
             </div>
+          ) : (
+            <div className="bg-white border border-dashed border-slate-200 rounded-3xl p-12 text-center max-w-md mx-auto mt-12 shadow-sm">
+              <span className="text-3xl">📦</span>
+              <h3 className="text-sm font-black text-slate-900 tracking-tight mt-3">No matching items indexed</h3>
+              <p className="text-xs text-slate-400 mt-1 font-medium leading-relaxed">
+                We couldn't locate any catalog entry matching your query criteria.
+              </p>
+            </div>
           )}
         </div>
       </div>
 
-      {/* -------------------------------------------------------------------------- */}
-      {/* DYNAMIC BACKDROP MODAL: REQUEST FOR QUOTE USER REGISTRATION DATA INPUT FORM */}
-      {/* -------------------------------------------------------------------------- */}
+      {/* FORM MODAL MODAL PANEL SYSTEM */}
       {showFormModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-center items-center p-4 z-50 overflow-y-auto">
           <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[90vh]">
-            
-            {/* Modal Heading Header */}
             <div className="bg-blue-950 text-white px-6 py-4 flex justify-between items-center shrink-0">
               <div>
                 <h2 className="text-sm font-black uppercase tracking-wider">Compile Procurement RFQ Slip</h2>
-                <p className="text-[10px] text-blue-200/70 font-medium">Please supply accurate communication coordinates below.</p>
               </div>
               <button onClick={() => setShowFormModal(false)} className="text-white/60 hover:text-white font-bold text-sm">✕</button>
             </div>
 
-            {/* Split Modal Body */}
             <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
-              
-              {/* Selected items array visualization display block */}
               <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200/60">
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Items Bundled Inside Order Line ({rfqCart.length})</p>
                 <div className="divide-y divide-slate-200/60 max-h-36 overflow-y-auto pr-1">
@@ -1086,93 +353,41 @@ export default function PublicProductsCatalog() {
                     <div key={item.id} className="py-2 flex justify-between items-center text-xs">
                       <div className="truncate max-w-sm">
                         <span className="font-bold text-slate-900">{item.name}</span>
-                        <span className="block text-[10px] text-slate-400 font-mono">ID Reference Node: {item.id}</span>
                       </div>
                       <div className="flex items-center space-x-3 shrink-0">
-                        <span className="bg-blue-50 text-blue-900 font-black px-2 py-0.5 rounded text-[10px]">
-                          QTY: {item.quantity} Units
-                        </span>
-                        <button onClick={() => removeFromCart(item.id)} className="text-rose-500 font-bold text-xs hover:text-rose-700">🗑️</button>
+                        <span className="bg-blue-50 text-blue-900 font-black px-2 py-0.5 rounded text-[10px]">QTY: {item.quantity} Units</span>
+                        <button onClick={() => removeFromCart(item.id)} className="text-rose-500 font-bold text-xs">🗑️</button>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Secure Registration form input layers */}
               <form onSubmit={handleQuoteSubmission} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase">Contact Full Name</label>
-                    <input 
-                      type="text" required value={formData.fullName}
-                      onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                      placeholder="e.g., Amit Sharma"
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-blue-950 font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase">Company/Enterprise Entity</label>
-                    <input 
-                      type="text" required value={formData.companyName}
-                      onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                      placeholder="e.g., Singrauli Minerals Private Ltd"
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-blue-950 font-medium"
-                    />
-                  </div>
+                  <input type="text" required value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} placeholder="Contact Full Name" className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 font-medium bg-slate-50"/>
+                  <input type="text" required value={formData.companyName} onChange={(e) => setFormData({...formData, companyName: e.target.value})} placeholder="Company/Enterprise Entity" className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 font-medium bg-slate-50"/>
                 </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase">Official Email Address Address</label>
-                    <input 
-                      type="email" required value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="procurement@company.com"
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-blue-950 font-medium"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[10px] font-black text-slate-500 uppercase">Mobile Coordinate Number</label>
-                    <input 
-                      type="tel" required value={formData.mobile}
-                      onChange={(e) => setFormData({...formData, mobile: e.target.value})}
-                      placeholder="10-digit smartphone number"
-                      className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-blue-950 font-medium"
-                    />
-                  </div>
+                  <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="Official Email Address" className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 font-medium bg-slate-50"/>
+                  <input type="tel" required value={formData.mobile} onChange={(e) => setFormData({...formData, mobile: e.target.value})} placeholder="Mobile Coordinate Number" className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 font-medium bg-slate-50"/>
                 </div>
-
-                <div className="space-y-1">
-                  <label className="text-[10px] font-black text-slate-500 uppercase">Specific Dispatch Requirements / Remarks (Optional)</label>
-                  <textarea 
-                    rows="3" value={formData.remarks}
-                    onChange={(e) => setFormData({...formData, remarks: e.target.value})}
-                    placeholder="Provide warehouse dispatch preferences, timeline constraints, or special packaging protocols..."
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 bg-slate-50 focus:outline-none focus:border-blue-950 font-medium"
-                  />
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full bg-blue-950 text-white font-black text-xs py-3 rounded-xl uppercase tracking-wider shadow-md hover:bg-blue-900 transition-colors"
-                >
-                  🚀 Dispatch Quotation Slip via Email & SMS
-                </button>
+                <textarea rows={3} value={formData.remarks} onChange={(e) => setFormData({...formData, remarks: e.target.value})} placeholder="Provide warehouse preferences..." className="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 font-medium bg-slate-50"/>
+                <button type="submit" className="w-full bg-blue-950 text-white font-black text-xs py-3 rounded-xl uppercase tracking-wider">🚀 Dispatch Quotation Slip</button>
               </form>
-
             </div>
           </div>
         </div>
       )}
-
-      {/* Embedded Mini styling layout wrapper updates */}
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9px; }
-      `}</style>
-
     </div>
+  );
+}
+
+// Next.js structural requirement: Suspense boundary ensures clean routing params loading
+export default function PublicProductsCatalog() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-xs font-black text-slate-400 uppercase tracking-widest">Initialising Procurement Data Grid...</div>}>
+      <ProductsCatalogContent />
+    </Suspense>
   );
 }

@@ -11,7 +11,7 @@ export default function PublicContactUsPage() {
   const [settings] = useState({
     pageMaxWidth: "max-w-6xl", // Dynamic input parameter from DB: max-w-4xl, max-w-6xl, max-w-7xl
     mapEmbedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115647.78442385157!2d82.59316131494875!3d24.119253457173268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398eec61df555555%3A0xa6cd46cf98dfad8b!2sSingrauli!5e0!3m2!1sen!2sin!4v1710000000000!3m2!1sen!2sin",
-    alertSuccessMessage: "Dhanyawad Bhai! Your enquiry has been captured seamlessly into SBS central node pipeline.",
+    alertSuccessMessage: "Thank you! For your enquiry has been captured seamlessly into SBS central node pipeline.",
   });
 
   const [fieldsConfig] = useState([
@@ -53,7 +53,6 @@ export default function PublicContactUsPage() {
         </div>
 
         <WhyChooseUsPublic />
-        {/* PINNED FAQS COMPONENT */}
         <PinnedFaqsStrip />
       </div>
     </div>

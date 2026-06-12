@@ -1,58 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-
-// UPDATED DUMMY DATA STRUCTURE (Supports Image, Video, Alignment & Timing)
-const dummySlides = [
-  {
-    id: "clx1234567890abcdefghijklmn", // CUID Format example
-    mediaType: "IMAGE", // IMAGE or VIDEO
-    mediaUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1920",
-    videoLoop: false,
-    videoNextOnEnd: false,
-    duration: 5, // 5 seconds for this image
-    layoutType: "LEFT", // LEFT, CENTER, RIGHT
-    title: "Premium Industrial Bearings",
-    subtitle: "Authorized Distributors & Suppliers",
-    description: "Providing high-grade mechanical spares, heavy-duty bearings, and power transmission solutions for over 20+ years.",
-    ctaText: "Explore Products",
-    ctaLink: "/products",
-    badgeColor: "bg-red-600",
-    ctaColor: "bg-blue-900 hover:bg-blue-800",
-  },
-  {
-    id: "clx234567890abcdefghijklmno",
-    mediaType: "VIDEO",
-    mediaUrl: "https://googleapis.com", // Sample Video
-    videoLoop: false, 
-    videoNextOnEnd: true, // Video khatam hote hi immediate next slide khulegi
-    duration: 0, // Duration ignore ho jayegi jab videoNextOnEnd true hoga
-    layoutType: "CENTER",
-    title: "DGMS Approved Safety Equipment",
-    subtitle: "Prioritizing Workplace Safety",
-    description: "Complete industrial safety gear, certified PPE kits, high-visibility clothing, and premium safety shoes for mining & plants.",
-    ctaText: "View Safety Range",
-    ctaLink: "/products?category=safety",
-    badgeColor: "bg-yellow-600",
-    ctaColor: "bg-green-700 hover:bg-green-600",
-  },
-  {
-    id: "clx34567890abcdefghijklmnop",
-    mediaType: "VIDEO",
-    mediaUrl: "https://googleapis.com",
-    videoLoop: true, // Loop me chalta rahega
-    videoNextOnEnd: false,
-    duration: 8, // Loop chalte hue bhi 8 seconds baad auto-slide ho jayega
-    layoutType: "LEFT",
-    title: "Fire Protection & Road Safety",
-    subtitle: "Compliance & Protection Guaranteed",
-    description: "Standard compliance fire extinguishers, suppression systems, and heavy-duty road safety indicators.",
-    ctaText: "Get a Quote",
-    ctaLink: "/contact",
-    badgeColor: "bg-red-600",
-    ctaColor: "bg-blue-900 hover:bg-blue-800",
-  },
-];
+// importing dummy data from a separate data file where source is data/heroCarousel.js
+import { dummySlides } from "@/data/heroCarousel";
 
 export default function HeroCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
