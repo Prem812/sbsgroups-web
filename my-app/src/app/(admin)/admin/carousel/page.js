@@ -1,53 +1,15 @@
-// File Location: src/app/admin/hero-manager/page.js
+// File Location: src/app/admin/carousel/page.js
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function AdminHeroCarouselDashboard() {
-  // Mock Initial Data - Matching your Prisma Schema precisely
-  const [slides, setSlides] = useState([
-    {
-      id: "clx1234567890abcdefghijklmn",
-      mediaType: "IMAGE",
-      mediaUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=1920",
-      videoLoop: false,
-      videoNextOnEnd: false,
-      duration: 5,
-      layoutType: "LEFT",
-      title: "Premium Industrial Bearings",
-      subtitle: "Authorized Distributors & Suppliers",
-      description: "Providing high-grade mechanical spares, heavy-duty bearings, and power transmission solutions for over 20+ years.",
-      ctaText: "Explore Products",
-      ctaLink: "/products",
-      badgeColor: "bg-red-600",
-      ctaColor: "bg-blue-900 hover:bg-blue-800",
-      sortOrder: 1,
-      isActive: true,
-    },
-    {
-      id: "clx234567890abcdefghijklmno",
-      mediaType: "VIDEO",
-      mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4", // Replace with valid video link
-      videoLoop: false,
-      videoNextOnEnd: true,
-      duration: 0,
-      layoutType: "CENTER",
-      title: "DGMS Approved Safety Equipment",
-      subtitle: "Prioritizing Workplace Safety",
-      description: "Complete industrial safety gear, certified PPE kits, high-visibility clothing, and premium safety shoes for mining & plants.",
-      ctaText: "View Safety Range",
-      ctaLink: "/products?category=safety",
-      badgeColor: "bg-yellow-600",
-      ctaColor: "bg-green-700 hover:bg-green-600",
-      sortOrder: 2,
-      isActive: true,
-    }
-  ]);
-
+  // Empty state structure directly connected via NestJS DB response pipelines
+  const [slides, setSlides] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
-  // CONTROL FORM FIELD BINDINGS STATES (Precise Type Matches for Prisma Model)
+  // CONTROL FORM FIELD BINDINGS STATES
   const [formData, setFormData] = useState({
     mediaType: "IMAGE",
     mediaUrl: "",
@@ -65,6 +27,22 @@ export default function AdminHeroCarouselDashboard() {
     sortOrder: 0,
     isActive: true,
   });
+
+  // 🔄 ACTION 1: Database se fresh sliders data pull karna
+  const fetchSlidesFromDb = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/api/hero-carousel/admin-list");
+      if (!res.ok) throw new Error("Server rejected or connection lost");
+      const data = await res.json();
+      setSlides(data);
+    } catch (err) {
+      console.error("❌ Database synchronization error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlidesFromDb();
+  }, []);
 
   const openCreateTrigger = () => {
     setEditingId(null);
@@ -94,28 +72,65 @@ export default function AdminHeroCarouselDashboard() {
     setShowModal(true);
   };
 
-  const handleFormSubmissionSubmit = (e) => {
+  // 🚀 ACTION 2: Form submission (Upsert: Create / Update Module router layer)
+  const handleFormSubmissionSubmit = async (e) => {
     e.preventDefault();
     
-    if (editingId) {
-      setSlides(prev => prev.map(item => item.id === editingId ? { ...formData, id: editingId } : item));
-      alert("Hero slide database structural properties updated successfully.");
-    } {
-      const generatedCuid = `clx${Math.random().toString(36).substr(2, 25)}`;
-      const payloadObj = { ...formData, id: generatedCuid };
-      setSlides([...slides, payloadObj]);
-      alert(`Success! New Slider Element Node deployed with ID: ${generatedCuid}`);
+    const urlRoute = editingId 
+      ? `http://localhost:4000/api/hero-carousel/save?id=${editingId}`
+      : `http://localhost:4000/api/hero-carousel/save`;
+
+    try {
+      const response = await fetch(urlRoute, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("✅ Hero slide properties synchronized with MySQL successfully!");
+        fetchSlidesFromDb(); // Dynamic component state validation updates
+        setShowModal(false);
+      } else {
+        alert("❌ Failed to push metadata config into server streaming layer.");
+      }
+    } catch (error) {
+      alert("❌ Server interaction dropped or CORS parameters error.");
     }
-    setShowModal(false);
   };
 
-  const toggleSlideStatus = (id) => {
-    setSlides(prev => prev.map(slide => slide.id === id ? { ...slide, isActive: !slide.isActive } : slide));
+  // 🟢 ACTION 3: Instantly toggle active slide switch nodes
+  const toggleSlideStatus = async (slide) => {
+    try {
+      const updatedData = { ...slide, isActive: !slide.isActive };
+      const response = await fetch(`http://localhost:4000/api/hero-carousel/save?id=${slide.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (response.ok) {
+        fetchSlidesFromDb();
+      }
+    } catch (err) {
+      console.error("❌ Node state switch failed:", err);
+    }
   };
 
-  const terminalWipeDelete = (id) => {
+  // 🗑️ ACTION 4: Physically purging elements from tables mapping
+  const terminalWipeDelete = async (id) => {
     if (confirm("CRITICAL ACTION: Are you absolutely certain you want to purge this Hero Slide node? This will remove it instantly from the public homepage view.")) {
-      setSlides(prev => prev.filter(s => s.id !== id));
+      try {
+        const response = await fetch(`http://localhost:4000/api/hero-carousel/delete/${id}`, {
+          method: "DELETE"
+        });
+        if (response.ok) {
+          alert("💥 Slide node deleted permanently from DB.");
+          setSlides(prev => prev.filter(s => s.id !== id));
+        }
+      } catch (err) {
+        alert("❌ Delete pipeline crash at system endpoint.");
+      }
     }
   };
 
@@ -146,7 +161,7 @@ export default function AdminHeroCarouselDashboard() {
 
         {/* ================= GRID LIST WITH ADVANCED UI/UX CARDS ================= */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {slides.sort((a,b) => a.sortOrder - b.sortOrder).map((slide) => (
+          {[...slides].sort((a,b) => a.sortOrder - b.sortOrder).map((slide) => (
             <div 
               key={slide.id} 
               className={`bg-slate-900 rounded-2xl border transition-all overflow-hidden flex flex-col justify-between shadow-xl ${
@@ -211,7 +226,7 @@ export default function AdminHeroCarouselDashboard() {
                 {/* CTA Blueprint Details */}
                 <div className="flex items-center gap-2 border-t border-slate-800/80 pt-3 text-[11px]">
                   <span className="text-slate-500 font-bold uppercase tracking-wider">CTA Button:</span>
-                  <a href={slide.ctaLink} target="_blank" className={`px-2.5 py-1 rounded text-[10px] font-bold text-white uppercase tracking-tight ${slide.ctaColor}`}>
+                  <a href={slide.ctaLink} target="_blank" rel="noreferrer" className={`px-2.5 py-1 rounded text-[10px] font-bold text-white uppercase tracking-tight ${slide.ctaColor}`}>
                     {slide.ctaText} ➔
                   </a>
                 </div>
@@ -220,7 +235,7 @@ export default function AdminHeroCarouselDashboard() {
               {/* Action Trigger Buttons footer Node */}
               <div className="bg-slate-950/40 border-t border-slate-800/80 px-5 py-3.5 flex items-center justify-between gap-2">
                 <button 
-                  onClick={() => toggleSlideStatus(slide.id)}
+                  onClick={() => toggleSlideStatus(slide)}
                   className={`text-[10px] font-black uppercase px-2.5 py-1.5 rounded-lg border transition-all ${
                     slide.isActive 
                       ? "bg-emerald-950/40 text-emerald-400 border-emerald-900 hover:bg-emerald-900 hover:text-white" 

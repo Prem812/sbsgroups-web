@@ -4,6 +4,7 @@ import { useState } from "react";
 import DynamicFormEngine from "@/components/public/DynamicFormEngine";
 import PinnedHotlines from "@/components/public/PinnedHotlines";
 import PinnedFaqsStrip from "@/components/public/PinnedFaqsStrip";
+import WhyChooseUsPublic from "@/components/WhyChooseUs"; // Yeh component bhi public folder mein hona chahiye taaki yeh page usko import kar sake
 
 export default function PublicContactUsPage() {
   // Mock Database Global settings fetch response
@@ -51,6 +52,7 @@ export default function PublicContactUsPage() {
           </div>
         </div>
 
+        <WhyChooseUsPublic />
         {/* PINNED FAQS COMPONENT */}
         <PinnedFaqsStrip />
       </div>

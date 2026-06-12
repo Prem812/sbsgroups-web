@@ -4,8 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -338,18 +338,19 @@ model FaqSystemSettings {
   autoResponseEmail   Boolean  @default(true)
 }
 
+// File Location: prisma/schema.prisma
+
 model FaqItem {
   id          String   @id @default(cuid())
   question    String   @db.VarChar(512)
   slug        String   @unique @db.VarChar(512)
   
-  // EditorJS ka output hamesha ek nested JSON object hota hai, isliye ise MySQL me Json type rakhenge
-  answerJson  Json     
+  // Is line ko check kijiye aur exact aise hi likhiye
+  answerJson  Json     @db.Json
   
   isPinned    Boolean  @default(false)
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
-  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

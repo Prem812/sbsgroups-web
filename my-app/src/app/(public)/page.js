@@ -12,9 +12,9 @@ export default function HomePage() {
     <>
       <HeroCarousel />
 
-      <ClientSlider />
-
       <WhyChooseUs />
+
+      <ClientSlider />
 
       <AboutIntro />
 

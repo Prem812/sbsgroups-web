@@ -1,73 +1,277 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 
-export default function PublicBrandsDirectoryPage() {
-  // DUMMY REPOSITORY FOR MASTER SUBSIDIARY BRANDS 
-  const [brands] = useState([
-    {
-      id: "BRND-01",
-      name: "SBS Heavy Machinery Spares",
-      slug: "sbs-heavy-machinery-spares",
-      tagline: "Precision Engineering for Extreme Mining Operations",
-      logo: "🧱",
-      summary: "Primary distribution line handling high-tensile crusher plates, automated conveyor tracks, and customized hydraulic components for Singrauli zone heavy fields."
-    },
-    {
-      id: "BRND-02",
-      name: "SBS Techno-Logistics Systems",
-      slug: "sbs-techno-logistics-systems",
-      tagline: "Automating B2B Supply Dispatches & Warehousing Flow",
-      logo: "🚚",
-      summary: "Next-gen routing logistics wing specialized in automated picking tracking setups, fuel monitoring algorithms, and instant site dispatch operations logs."
-    }
-  ]);
+/* ============================ DYNAMIC CONFIG ============================== */
+const PAGE_CONFIG = {
+  layout: { container: "max-w-6xl", gridCols: "md:grid-cols-2 xl:grid-cols-3" },
+  card: { variant: "elevated", radius: "xl", padding: "md" },
+  description: { maxChars: 120 },
+  show: {
+    search: true,
+    sectorFilter: true,
+    founders: true,
+    stats: true,
+  },
+};
+
+const UI = {
+  cardVariants: {
+    elevated: "bg-white border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1",
+  },
+  radii: { xl: "rounded-2xl" },
+  paddings: { md: "p-5 md:p-6" },
+};
+
+const cardClass = () =>
+  `${UI.cardVariants.elevated} ${UI.radii[PAGE_CONFIG.card.radius]} ${UI.paddings[PAGE_CONFIG.card.padding]}`;
+
+/* ============================ MOCK DATA =================================== */
+export const BRANDS = [
+  {
+    id: "BRAND-01",
+    slug: "nexis-automation",
+    brandName: "Nexis Automation",
+    logo: "https://placehold.co/120x120/0f172a/38bdf8?text=NEXIS",
+    sector: "Industrial Tech",
+    founder: "Rajesh Vardhan",
+    coFounder: "Amit K. Sharma",
+    establishedIn: "2020",
+    url: "https://nexisautomation.example.com",
+    tagline: "Intelligent Robotics & Edge Computing",
+    editorDescription: "Nexis is shifting old manufacturing plants into smart factories. Their new AI systems process field sensor loops locally with zero lag.",
+    currentOperations: "Madhya Pradesh, Gujarat, Maharashtra",
+  },
+  {
+    id: "BRAND-02",
+    slug: "quantum-lubes",
+    brandName: "Quantum Lubes",
+    logo: "https://placehold.co/120x120/1e3a8a/f59e0b?text=QUANTUM",
+    sector: "Chemicals & Oils",
+    founder: "Vikramaditya Rao",
+    coFounder: "Dr. S. Malhotra",
+    establishedIn: "2022",
+    url: "", // testing empty url fallback
+    tagline: "Next-Gen Synthetic Heavy Bio-Lubricants",
+    editorDescription: "A clean energy brand creating plant-extracted lubricants that survive deep heat thresholds without turning into toxic sludge.",
+    currentOperations: "Singrauli Hub, NCR, Visakhapatnam Port",
+  },
+  {
+    id: "BRAND-03",
+    slug: "aeroshield-safety",
+    brandName: "AeroShield Safety",
+    logo: "https://placehold.co/120x120/7c2d12/10b981?text=SHIELD",
+    sector: "Safety Hardware",
+    founder: "Nisha Mandloi",
+    coFounder: "George K. John",
+    establishedIn: "2019",
+    url: "https://aeroshield.example.com",
+    tagline: "Smart Defensive PPE Systems",
+    editorDescription: "Developing safety wear fitted with real-time biometric tracking to monitor gas exposure and heart vitals for heavy infrastructure workers.",
+    currentOperations: "PAN India Distribution, Exporting to UAE",
+  }
+];
+
+/* ============================ HELPERS ===================================== */
+const fallbackImg = (e) => {
+  e.currentTarget.src = "https://placehold.co/120x120/f1f5f9/94a3b8?text=Brand";
+};
+
+/* ============================ COMPONENT =================================== */
+export default function BrandsDirectoryPage() {
+  const [query, setQuery] = useState("");
+  const [activeSector, setActiveSector] = useState("All");
+
+  const sectors = useMemo(
+    () => ["All", ...Array.from(new Set(BRANDS.map((b) => b.sector).filter(Boolean)))],
+    []
+  );
+
+  const filteredBrands = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return BRANDS.filter((b) => {
+      const matchesQuery =
+        !q ||
+        b.brandName?.toLowerCase().includes(q) ||
+        b.founder?.toLowerCase().includes(q) ||
+        b.sector?.toLowerCase().includes(q);
+      const matchesSector = activeSector === "All" || b.sector === activeSector;
+      return matchesQuery && matchesSector;
+    });
+  }, [query, activeSector]);
 
   return (
-    <div className="bg-slate-50 min-h-screen p-6 md:p-12 font-sans text-slate-800 antialiased">
-      <div className="max-w-6xl mx-auto space-y-8">
-        
-        {/* BANNER GRID HEADER */}
-        <div className="border-b border-slate-200 pb-5 max-w-2xl">
-          <span className="text-xs font-black text-blue-950 uppercase tracking-widest">Subsidiary Architecture</span>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">The SBS Brands Umbrella</h1>
-          <p className="text-xs text-slate-500 font-medium">Explore our targeted industrial verticals, each engineered independently to streamline high-output heavy supply matrices.</p>
-        </div>
-
-        {/* BRANDS LIST MATRIX CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {brands.map((brand) => (
-            <div key={brand.id} className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:border-slate-400 hover:shadow-md transition-all group">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-4xl p-3 bg-slate-50 group-hover:bg-blue-50 border rounded-2xl transition-all">{brand.logo}</span>
-                  <span className="text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded tracking-wider">{brand.id}</span>
-                </div>
-                
-                <div className="space-y-1">
-                  <h3 className="text-base font-black text-slate-900 group-hover:text-blue-900 transition-colors tracking-tight">{brand.name}</h3>
-                  <p className="text-xs text-blue-950/80 font-bold italic tracking-tight">{brand.tagline}</p>
-                </div>
-
-                <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                  {brand.summary}
-                </p>
-              </div>
-
-              <div className="pt-6 mt-6 border-t border-slate-100">
-                <Link 
-                  href={`/brands/${brand.slug}`}
-                  className="w-full block text-center text-[10px] font-black uppercase bg-slate-900 text-white py-2.5 rounded-xl tracking-wider hover:bg-slate-800 shadow-sm transition-colors"
-                >
-                  Explore Brand Profile & Catalog ➔
-                </Link>
-              </div>
+    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 antialiased">
+      {/* ==================== HERO SECTION ==================== */}
+      <div className="bg-white border-b border-slate-200">
+        <div className={`${PAGE_CONFIG.layout.container} mx-auto px-4 md:px-8 py-12`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="max-w-2xl">
+              <span className="text-xs font-black text-indigo-600 uppercase tracking-widest">In-House Portfolios</span>
+              <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mt-1">
+                Our Native Proprietary Brands
+              </h1>
+              <p className="text-xs md:text-sm text-slate-500 font-medium mt-2 leading-relaxed">
+                Discover our internally engineered brand labels designed to meet heavy industrial demands, 
+                clean chemical processing, and smart field operations.
+              </p>
             </div>
-          ))}
-        </div>
+            {PAGE_CONFIG.show.stats && (
+              <div className="bg-slate-900 text-white rounded-2xl p-5 flex gap-6 shrink-0 shadow-md">
+                <div>
+                  <p className="text-2xl font-black tracking-tight">{BRANDS.length}</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 mt-0.5">Active Brands</p>
+                </div>
+                <div className="w-px bg-slate-800" />
+                <div>
+                  <p className="text-2xl font-black tracking-tight">30+</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 mt-0.5">Regions Active</p>
+                </div>
+              </div>
+            )}
+          </div>
 
+          {/* SEARCH & FILTERS */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-8">
+            {PAGE_CONFIG.show.search && (
+              <div className="relative flex-1">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search by brand name, founder or domain..."
+                  className="w-full text-xs font-medium pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all"
+                />
+              </div>
+            )}
+            {PAGE_CONFIG.show.sectorFilter && (
+              <div className="flex gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
+                {sectors.map((sec) => (
+                  <button
+                    key={sec}
+                    onClick={() => setActiveSector(sec)}
+                    className={`whitespace-nowrap text-[10px] font-black uppercase tracking-wider px-4 py-2.5 rounded-xl border transition-all ${
+                      activeSector === sec
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-slate-400"
+                    }`}
+                  >
+                    {sec}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* ==================== BRANDS GRID ==================== */}
+      <div className={`${PAGE_CONFIG.layout.container} mx-auto px-4 md:px-8 py-10`}>
+        {filteredBrands.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-2xl border border-slate-200">
+            <span className="text-5xl mb-3 opacity-30">📦</span>
+            <h3 className="text-base font-black text-slate-900">No House Brands Found</h3>
+            <p className="text-xs text-slate-500 mt-1">Refine your active keyword or switch categories tab.</p>
+          </div>
+        ) : (
+          <div className={`grid grid-cols-1 ${PAGE_CONFIG.layout.gridCols} gap-6`}>
+            {filteredBrands.map((brand) => {
+              const shortDesc =
+                brand.editorDescription?.length > PAGE_CONFIG.description.maxChars
+                  ? brand.editorDescription.slice(0, PAGE_CONFIG.description.maxChars).trimEnd() + "…"
+                  : brand.editorDescription;
+
+              return (
+                <div key={brand.id} className={`${cardClass()} flex flex-col justify-between transition-all duration-300 group`}>
+                  <div className="space-y-4">
+                    {/* Brand Meta Top Row */}
+                    <div className="flex justify-between items-start gap-4">
+                      <img
+                        src={brand.logo}
+                        alt={`${brand.brandName} logo`}
+                        onError={fallbackImg}
+                        className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shrink-0 shadow-sm bg-white"
+                      />
+                      <div className="text-right">
+                        <span className="text-[9px] font-mono font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded tracking-wider">
+                          Est. {brand.establishedIn}
+                        </span>
+                        <span className="block text-[10px] font-black text-indigo-600 bg-indigo-50 border border-indigo-100/50 px-2 py-0.5 rounded-md mt-1.5 uppercase tracking-tight">
+                          {brand.sector}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Brand Identity */}
+                    <div>
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors tracking-tight">
+                        {brand.brandName}
+                      </h3>
+                      <p className="text-[11px] font-bold text-slate-400 italic mt-0.5">
+                        "{brand.tagline}"
+                      </p>
+                    </div>
+
+                    {/* Founders Metadata */}
+                    {PAGE_CONFIG.show.founders && (brand.founder || brand.coFounder) && (
+                      <div className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-2.5 text-[11px] text-slate-600 font-medium space-y-0.5">
+                        {brand.founder && <p>👤 <span className="text-slate-400 font-semibold">Founder:</span> <span className="font-bold text-slate-800">{brand.founder}</span></p>}
+                        {brand.coFounder && <p>👥 <span className="text-slate-400 font-semibold">Co-Founder:</span> <span className="font-bold text-slate-800">{brand.coFounder}</span></p>}
+                      </div>
+                    )}
+
+                    {/* Editor Short Note */}
+                    {shortDesc && (
+                      <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                        {shortDesc}
+                      </p>
+                    )}
+
+                    {/* Current Footprint Mini Strip */}
+                    {brand.currentOperations && (
+                      <div className="text-[10px] font-semibold text-slate-400 truncate">
+                        <span className="font-black text-slate-600 uppercase text-[9px] tracking-wider mr-1">📍 Footprint:</span> 
+                        {brand.currentOperations}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions Area */}
+                  <div className="pt-4 mt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+                    {brand.url ? (
+                      <a
+                        href={brand.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 tracking-wider"
+                      >
+                        🌐 Live Hub ↗
+                      </a>
+                    ) : (
+                      <span className="text-[10px] font-bold text-slate-300 italic">No external URL</span>
+                    )}
+
+                    <Link
+                      href={`/brands/${brand.slug}`}
+                      className="text-[10px] font-black uppercase tracking-wider bg-slate-900 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl transition-all shadow-sm"
+                    >
+                      Explore Brand Details ➔
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      `}</style>
     </div>
   );
 }
