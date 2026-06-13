@@ -2,7 +2,7 @@ export const categories = [
   {
     id: "cat-1",
     name: "Hand Tools",
-    icon: "🔧",
+    icon: "🔧", // select icon from react-icons
     image: "https://images.unsplash.com/photo-1508847154043-be12a62861c1?auto=format&fit=crop&q=80&w=500",
     subcategories: [
       {
