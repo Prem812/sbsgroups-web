@@ -1,4 +1,4 @@
-const dummyAboutContent = {
+export const dummyAboutContent = {
   headingPart1: "Leading the Industry with",
   headingPart2: "Innovation",
   description: "SBS GROUPS – a trusted name among the leading Industrial Products Suppliers, is known for delivering excellence, reliability, and a wide range of solutions for diverse industries. We deal in an extensive product portfolio that includes Industrial Safety Equipment, Fire Extinguishers, Road Safety Products, Hand & Power Tools, Mechanical Components, Electrical Supplies, and many others.",
