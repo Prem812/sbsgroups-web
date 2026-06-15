@@ -1,18 +1,20 @@
 export const categories = [
   {
-    id: "cat-1",
+    id: "", //cuid
     name: "Hand Tools",
-    icon: "🔧", // select icon from react-icons
+    icon: "🔧", // select icon from react-icons or favicon
     image: "https://images.unsplash.com/photo-1508847154043-be12a62861c1?auto=format&fit=crop&q=80&w=500",
+    subcategoriesCount: 2,
     subcategories: [
       {
-        id: "subcat-1",
+        id: "", // cuid
         name: "Wrenches",
         image: "https://images.unsplash.com/photo-1508847154043-be12a62861c1?auto=format&fit=crop&q=80&w=500",
         productCount: 3,
         products: [
           {
-            id: "SKU-9001",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Adjustable Wrench (10-inch)",
             specification: "Chrome plated, Anti-slip grip",
             zone: "Singrauli Main Hub",
@@ -31,7 +33,8 @@ export const categories = [
             ]
           },
           {
-            id: "SKU-9002",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Set of Combination Wrenches (6-32mm)",
             specification: "SAE & Metric, Mirror polished",
             zone: "NCL Spares Depot",
@@ -50,7 +53,8 @@ export const categories = [
             ]
           },
           {
-            id: "SKU-9003",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Pipe Wrench Heavy Duty (18-inch)",
             specification: "Iron casting, Serrated jaws",
             zone: "Korba Hub",
@@ -76,7 +80,8 @@ export const categories = [
         productCount: 3,
         products: [
           {
-            id: "SKU-9004",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Socket Set 1/2-inch Drive (40 Pieces)",
             specification: "Chrome vanadium steel, Metric & SAE",
             zone: "Singrauli Main Hub",
@@ -95,7 +100,8 @@ export const categories = [
             ]
           },
           {
-            id: "SKU-9005",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Torque Wrench Click Type 1/2-inch",
             specification: "Range 42-210 N·m, Calibrated",
             zone: "NCL Spares Depot",
@@ -114,7 +120,8 @@ export const categories = [
             ]
           },
           {
-            id: "SKU-9006",
+            id: "", // cuid
+            model: "",  // will be unique
             name: "Ratchet Handle 3/8-inch 72-Tooth",
             specification: "Quick release, Polished finish",
             zone: "Korba Hub",
